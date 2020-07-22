@@ -30,29 +30,29 @@ code: |
       {'variable': 'court_name',
        'transformed_variable': 'str(courts[0])',
       },
-      {'variable': 'petitioner_name',
-       'transformed_variable': 'str(petitioners[0])',
+      {'variable': 'user_name',
+       'transformed_variable': 'str(users[0])',
       },
-      {'variable': 'petitioner_address_one_line',
-       'transformed_variable': 'petitioners[0].address.on_one_line()',
+      {'variable': 'user_address_one_line',
+       'transformed_variable': 'users[0].address.on_one_line()',
       },
-      {'variable': 'petitioner_birthdate',
-       'transformed_variable': 'petitioners[0].birthdate.format()',
+      {'variable': 'user_birthdate',
+       'transformed_variable': 'users[0].birthdate.format()',
       },
-      {'variable': 'petitioner_signature',
-       'transformed_variable': 'petitioners[0].signature',
+      {'variable': 'user_signature',
+       'transformed_variable': 'users[0].signature',
       },
-      {'variable': 'petitioner_address_street',
-       'transformed_variable': 'petitioners[0].address.address',
+      {'variable': 'user_address_street',
+       'transformed_variable': 'users[0].address.address',
       },
-      {'variable': 'petitioner_address_city',
-       'transformed_variable': 'petitioners[0].address.city',
+      {'variable': 'user_address_city',
+       'transformed_variable': 'users[0].address.city',
       },
-      {'variable': 'petitioner_address_state',
-       'transformed_variable': 'petitioners[0].address.state',
+      {'variable': 'user_address_state',
+       'transformed_variable': 'users[0].address.state',
       },
-      {'variable': 'petitioner_address_zip',
-       'transformed_variable': 'petitioners[0].address.zip',
+      {'variable': 'user_address_zip',
+       'transformed_variable': 'users[0].address.zip',
       },
       {'variable': 'signature_date',
        'transformed_variable': 'signature_date',
@@ -77,88 +77,88 @@ code: |
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_grade_school_completed',
-       'transformed_variable': 'petitioners[0].grade_school_completed',
+      {'variable': 'user_grade_school_completed',
+       'transformed_variable': 'users[0].grade_school_completed',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_training',
-       'transformed_variable': 'petitioners[0].training',
+      {'variable': 'user_training',
+       'transformed_variable': 'users[0].training',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_disabilities',
-       'transformed_variable': 'petitioners[0].disabilities',
+      {'variable': 'user_disabilities',
+       'transformed_variable': 'users[0].disabilities',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_dependents_number',
-       'transformed_variable': 'petitioners[0].dependents_number',
+      {'variable': 'user_dependents_number',
+       'transformed_variable': 'users[0].dependents_number',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_work_address_one_line',
-       'transformed_variable': 'petitioners[0].work_address_one_line',
+      {'variable': 'user_work_address_one_line',
+       'transformed_variable': 'users[0].work_address_one_line',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_work_name',
-       'transformed_variable': 'petitioners[0].work_name',
+      {'variable': 'user_work_name',
+       'transformed_variable': 'users[0].work_name',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_income_nonemployment',
-       'transformed_variable': 'petitioners[0].income_nonemployment',
+      {'variable': 'user_income_nonemployment',
+       'transformed_variable': 'users[0].income_nonemployment',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_income_gross_annual',
-       'transformed_variable': 'petitioners[0].income_gross_annual',
+      {'variable': 'user_income_gross_annual',
+       'transformed_variable': 'users[0].income_gross_annual',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_income_gross_monthly',
-       'transformed_variable': 'petitioners[0].income_gross_monthly',
+      {'variable': 'user_income_gross_monthly',
+       'transformed_variable': 'users[0].income_gross_monthly',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_federal',
-       'transformed_variable': 'petitioners[0].tax_federal',
+      {'variable': 'user_tax_federal',
+       'transformed_variable': 'users[0].tax_federal',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_state',
-       'transformed_variable': 'petitioners[0].tax_state',
+      {'variable': 'user_tax_state',
+       'transformed_variable': 'users[0].tax_state',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_social_security',
-       'transformed_variable': 'petitioners[0].tax_social_security',
+      {'variable': 'user_tax_social_security',
+       'transformed_variable': 'users[0].tax_social_security',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_medicare',
-       'transformed_variable': 'petitioners[0].tax_medicare',
+      {'variable': 'user_tax_medicare',
+       'transformed_variable': 'users[0].tax_medicare',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_other',
-       'transformed_variable': 'petitioners[0].tax_other',
+      {'variable': 'user_tax_other',
+       'transformed_variable': 'users[0].tax_other',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_other_amount',
-       'transformed_variable': 'petitioners[0].tax_other_amount',
+      {'variable': 'user_tax_other_amount',
+       'transformed_variable': 'users[0].tax_other_amount',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_tax_total',
-       'transformed_variable': 'petitioners[0].tax_total',
+      {'variable': 'user_tax_total',
+       'transformed_variable': 'users[0].tax_total',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_income_after_tax',
-       'transformed_variable': 'petitioners[0].income_after_tax',
+      {'variable': 'user_income_after_tax',
+       'transformed_variable': 'users[0].income_after_tax',
       'field_type': 'text',
       'field_data_type': 'text',
       },
@@ -172,189 +172,189 @@ code: |
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_income_after_tax__1',
-       'transformed_variable': 'petitioners[0].income_after_tax',
+      {'variable': 'user_income_after_tax__1',
+       'transformed_variable': 'users[0].income_after_tax',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_rent',
-       'transformed_variable': 'petitioners[0].expense_rent',
+      {'variable': 'user_expense_rent',
+       'transformed_variable': 'users[0].expense_rent',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_uninsured_medical',
-       'transformed_variable': 'petitioners[0].expense_uninsured_medical',
+      {'variable': 'user_expense_uninsured_medical',
+       'transformed_variable': 'users[0].expense_uninsured_medical',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_food',
-       'transformed_variable': 'petitioners[0].expense_food',
+      {'variable': 'user_expense_food',
+       'transformed_variable': 'users[0].expense_food',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_childcare',
-       'transformed_variable': 'petitioners[0].expense_childcare',
+      {'variable': 'user_expense_childcare',
+       'transformed_variable': 'users[0].expense_childcare',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_electricity',
-       'transformed_variable': 'petitioners[0].expense_electricity',
+      {'variable': 'user_expense_electricity',
+       'transformed_variable': 'users[0].expense_electricity',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_education',
-       'transformed_variable': 'petitioners[0].expense_education',
+      {'variable': 'user_expense_education',
+       'transformed_variable': 'users[0].expense_education',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_child_support',
-       'transformed_variable': 'petitioners[0].expense_child_support',
+      {'variable': 'user_expense_child_support',
+       'transformed_variable': 'users[0].expense_child_support',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_gas',
-       'transformed_variable': 'petitioners[0].expense_gas',
+      {'variable': 'user_expense_gas',
+       'transformed_variable': 'users[0].expense_gas',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_clothing',
-       'transformed_variable': 'petitioners[0].expense_clothing',
+      {'variable': 'user_expense_clothing',
+       'transformed_variable': 'users[0].expense_clothing',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_oil',
-       'transformed_variable': 'petitioners[0].expense_oil',
+      {'variable': 'user_expense_oil',
+       'transformed_variable': 'users[0].expense_oil',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_laundry',
-       'transformed_variable': 'petitioners[0].expense_laundry',
+      {'variable': 'user_expense_laundry',
+       'transformed_variable': 'users[0].expense_laundry',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_water',
-       'transformed_variable': 'petitioners[0].expense_water',
+      {'variable': 'user_expense_water',
+       'transformed_variable': 'users[0].expense_water',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_car_insurance',
-       'transformed_variable': 'petitioners[0].expense_car_insurance',
+      {'variable': 'user_expense_car_insurance',
+       'transformed_variable': 'users[0].expense_car_insurance',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_telephone',
-       'transformed_variable': 'petitioners[0].expense_telephone',
+      {'variable': 'user_expense_telephone',
+       'transformed_variable': 'users[0].expense_telephone',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_health_insurance',
-       'transformed_variable': 'petitioners[0].expense_health_insurance',
+      {'variable': 'user_expense_health_insurance',
+       'transformed_variable': 'users[0].expense_health_insurance',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_ransportation',
-       'transformed_variable': 'petitioners[0].expense_ransportation',
+      {'variable': 'user_expense_ransportation',
+       'transformed_variable': 'users[0].expense_ransportation',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_other',
-       'transformed_variable': 'petitioners[0].expense_other',
+      {'variable': 'user_expense_other',
+       'transformed_variable': 'users[0].expense_other',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_other_amount',
-       'transformed_variable': 'petitioners[0].expense_other_amount',
+      {'variable': 'user_expense_other_amount',
+       'transformed_variable': 'users[0].expense_other_amount',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_expense_total',
-       'transformed_variable': 'petitioners[0].expense_total',
+      {'variable': 'user_expense_total',
+       'transformed_variable': 'users[0].expense_total',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_income_net',
-       'transformed_variable': 'petitioners[0].income_net',
+      {'variable': 'user_income_net',
+       'transformed_variable': 'users[0].income_net',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_owns_home_yes',
-       'transformed_variable': 'petitioners[0].owns_home_yes',
+      {'variable': 'user_owns_home_yes',
+       'transformed_variable': 'users[0].owns_home_yes',
       'field_type': 'yesno',
       },
-      {'variable': 'petitioner_owns_home_no',
-       'transformed_variable': 'petitioners[0].owns_home_no',
+      {'variable': 'user_owns_home_no',
+       'transformed_variable': 'users[0].owns_home_no',
       'field_type': 'yesno',
       },
-      {'variable': 'petitioner_home_value',
-       'transformed_variable': 'petitioners[0].home_value',
+      {'variable': 'user_home_value',
+       'transformed_variable': 'users[0].home_value',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_home_debt',
-       'transformed_variable': 'petitioners[0].home_debt',
+      {'variable': 'user_home_debt',
+       'transformed_variable': 'users[0].home_debt',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_owns_car_no',
-       'transformed_variable': 'petitioners[0].owns_car_no',
+      {'variable': 'user_owns_car_no',
+       'transformed_variable': 'users[0].owns_car_no',
       'field_type': 'yesno',
       },
-      {'variable': 'petitioner_owns_car_yes',
-       'transformed_variable': 'petitioners[0].owns_car_yes',
+      {'variable': 'user_owns_car_yes',
+       'transformed_variable': 'users[0].owns_car_yes',
       'field_type': 'yesno',
       },
-      {'variable': 'petitioner_car_year',
-       'transformed_variable': 'petitioners[0].car_year',
+      {'variable': 'user_car_year',
+       'transformed_variable': 'users[0].car_year',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_car_make',
-       'transformed_variable': 'petitioners[0].car_make',
+      {'variable': 'user_car_make',
+       'transformed_variable': 'users[0].car_make',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_car_debt',
-       'transformed_variable': 'petitioners[0].car_debt',
+      {'variable': 'user_car_debt',
+       'transformed_variable': 'users[0].car_debt',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_car_value',
-       'transformed_variable': 'petitioners[0].car_value',
+      {'variable': 'user_car_value',
+       'transformed_variable': 'users[0].car_value',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_accounts_balance',
-       'transformed_variable': 'petitioners[0].accounts_balance',
+      {'variable': 'user_accounts_balance',
+       'transformed_variable': 'users[0].accounts_balance',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_accounts_type',
-       'transformed_variable': 'petitioners[0].accounts_type',
+      {'variable': 'user_accounts_type',
+       'transformed_variable': 'users[0].accounts_type',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_property_type',
-       'transformed_variable': 'petitioners[0].property_type',
+      {'variable': 'user_property_type',
+       'transformed_variable': 'users[0].property_type',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_property_value',
-       'transformed_variable': 'petitioners[0].property_value',
+      {'variable': 'user_property_value',
+       'transformed_variable': 'users[0].property_value',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_debts',
-       'transformed_variable': 'petitioners[0].debts',
+      {'variable': 'user_debts',
+       'transformed_variable': 'users[0].debts',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_miscellaneous_facts',
-       'transformed_variable': 'petitioners[0].miscellaneous_facts',
+      {'variable': 'user_miscellaneous_facts',
+       'transformed_variable': 'users[0].miscellaneous_facts',
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'petitioner_name_print',
-       'transformed_variable': 'petitioners[0].name_print',
+      {'variable': 'user_name_print',
+       'transformed_variable': 'users[0].name_print',
       'field_type': 'text',
       'field_data_type': 'text',
       },
@@ -362,67 +362,84 @@ code: |
   })
 ---
 question: |
-  Please list debts.
+  List debts
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner debts': users[0].debts
+  - 'Debts': users[0].debts
 ---
 question: |
   Signature
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner name print': users[0].name_print
+  - 'Name': users[0].name_print
 ---
 question: |
-  What are your monthly tax deductions?
+  Monthly Tax Deductions
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner federal tax': users[0].tax_federal
-  - 'Petitioner state tax': petitioners[0].tax_state
-  - 'Petitioner social security tax': petitioners[0].tax_social_security
-  - 'Petitioner medicare tax': petitioners[0].tax_medicare
-  - 'Petitioner other tax': petitioners[0].tax_other
-  - 'Petitioner other tax amount': petitioners[0].tax_other_amount
-  - 'Petitioner total tax': petitioners[0].tax_total
+  - 'Federal tax': users[0].tax_federal
+  - 'State tax': users[0].tax_state
+  - 'Social security tax': users[0].tax_social_security
+  - 'Medicare tax': users[0].tax_medicare
+  - 'Other tax': users[0].tax_other
+  - 'Other tax amount': users[0].tax_other_amount
+  - 'Total tax': users[0].tax_total
 ---
 question: |
-  What are your sources of income?
+  Sources of Income
 subquestion: |
   Placeholder text
 fields:
   - 'Number of dependents': users[0].dependents_number
-  - 'Petitioner work address': petitioners[0].work_address_one_line
-  - 'Petitioner work name': petitioners[0].work_name
-  - 'Petitioner income non-employment': petitioners[0].income_nonemployment
-  - 'Petitioner gross annual income': petitioners[0].income_gross_annual
-  - 'Petitioner gross monthly income': petitioners[0].income_gross_monthly
+  - 'Employer name': users[0].work_name
+  - 'Employer address': users[0].work_address_one_line
+  - 'Non-employment Income': users[0].income_nonemployment
+  - 'Gross annual income': users[0].income_gross_annual
+  - 'Gross monthly income': users[0].income_gross_monthly
 ---
 question: |
-  What assets do you own?
+  Do you own a home?
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner owns home yes': users[0].owns_home_yes
-    datatype: yesno
-  - 'Petitioner owns home no': users[0].owns_home_no
-    datatype: yesno
-  - 'Petitioner home value': petitioners[0].home_value
-  - 'Petitioner home debt': petitioners[0].home_debt
-  - 'Petitioner owns car no': petitioners[0].owns_car_no
-    datatype: yesno
-  - 'Petitioner owns car yes': petitioners[0].owns_car_yes
-    datatype: yesno
-  - 'Petitioner car year': petitioners[0].car_year
-  - 'Petitioner car make': petitioners[0].car_make
-  - 'Petitioner car debt': petitioners[0].car_debt
-  - 'Petitioner car value': petitioners[0].car_value
-  - 'Petitioner accounts balance': petitioners[0].accounts_balance
-  - 'Petitioner accounts type': petitioners[0].accounts_type
-  - 'Petitioner property type': petitioners[0].property_type
-  - 'Petitioner property value': petitioners[0].property_value
+  - no label: users[0].owns_home_yes
+    datatype: yesnoradio
+  - 'Home value': users[0].home_value
+    show if: users[0].owns_home_yes
+  - 'Home debt': users[0].home_debt
+    show if: users[0].owns_home_yes
+---
+question: |
+  Do you own a car?
+subquestion: |
+  Placeholder text
+fields:
+  - no label: users[0].owns_car_yes
+    datatype: yesnoradio
+  - 'Car value': users[0].car_value
+    show if: users[0].owns_car_yes
+  - 'Car year': users[0].car_year
+    show if: users[0].owns_car_yes
+  - 'Car make': users[0].car_make
+    show if: users[0].owns_car_yes
+  - 'Do you have any car debt?': users[0].car_loan
+    show if: users[0].owns_car_yes
+    datatype: yesnoradio
+  - 'Car debt amount': users[0].car_debt
+    show if: users[0].car_loan
+---
+question: |
+  List Assets
+subquestion: |
+  Placeholder text
+fields:
+  - 'Bank account type': users[0].accounts_type
+  - 'Bank accounts balance': users[0].accounts_balance
+  - 'List all property, including Real Estate': users[0].property_type
+  - 'Property value': users[0].property_value
 ---
 question: |
   What is the information of your case?
@@ -433,56 +450,61 @@ fields:
   - 'Case name': case_name
 ---
 question: |
-  What is your educational background?
+  Education and Training
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner grade school completed': users[0].grade_school_completed
-  - 'Petitioner training': petitioners[0].training
-  - 'Petitioner disabilities': petitioners[0].disabilities
+  - 'Highest grade in school completed': users[0].grade_school_completed
+  - 'Special training': users[0].training
+  - 'List any mental or physical disabilities which affect your earning capacity or living expenses': users[0].disabilities
 ---
 question: |
-  What is your monthly net income?
+  Net Income
 subquestion: |
-  Placeholder text
+  List monthly expenses
 fields:
-  - 'Petitioner income after tax': users[0].income_after_tax
-  - 'Petitioner rent expense': petitioners[0].expense_rent
-  - 'Petitioner uninsured medical expense': petitioners[0].expense_uninsured_medical
-  - 'Petitioner food expense': petitioners[0].expense_food
-  - 'Petitioner childcare expense': petitioners[0].expense_childcare
-  - 'Petitioner electricity expense': petitioners[0].expense_electricity
-  - 'Petitioner education expense': petitioners[0].expense_education
-  - 'Petitioner child support expense': petitioners[0].expense_child_support
-  - 'Petitioner gas expense': petitioners[0].expense_gas
-  - 'Petitioner clothing expense': petitioners[0].expense_clothing
-  - 'Petitioner oil expense': petitioners[0].expense_oil
-  - 'Petitioner laundry expense': petitioners[0].expense_laundry
-  - 'Petitioner water expense': petitioners[0].expense_water
-  - 'Petitioner car insurance expense': petitioners[0].expense_car_insurance
-  - 'Petitioner telephone expense': petitioners[0].expense_telephone
-  - 'Petitioner health insurance expense': petitioners[0].expense_health_insurance
-  - 'Petitioner transportation expense': petitioners[0].expense_ransportation
-  - 'Petitioner other expense': petitioners[0].expense_other
-  - 'Petitioner other expense amount': petitioners[0].expense_other_amount
-  - 'Petitioner total expenses': petitioners[0].expense_total
-  - 'Petitioner net income': petitioners[0].income_net
+  - 'Rent expense': users[0].expense_rent
+  - 'Uninsured medical expense': users[0].expense_uninsured_medical
+  - 'Food expense': users[0].expense_food
+  - 'Childcare expense': users[0].expense_childcare
+  - 'Electricity expense': users[0].expense_electricity
+  - 'Education expense': users[0].expense_education
+  - 'Child support expense': users[0].expense_child_support
+  - 'Gas expense': users[0].expense_gas
+  - 'Clothing expense': users[0].expense_clothing
+  - 'Oil expense': users[0].expense_oil
+  - 'Laundry expense': users[0].expense_laundry
+  - 'Water expense': users[0].expense_water
+  - 'Car insurance expense': users[0].expense_car_insurance
+  - 'Telephone expense': users[0].expense_telephone
+  - 'user health insurance expense': users[0].expense_health_insurance
+  - 'Transportation expense': users[0].expense_ransportation
+  - 'Other expense': users[0].expense_other
+  - 'Other expense amount': users[0].expense_other_amount
+  # Hopefully will be auto-populated - 'Total expenses': users[0].expense_total
+  # Hopefully will be auto-populated - 'Net income': users[0].income_net
 ---
 question: |
-  What is your total income after taxes?
+  Total Income After Taxes
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner income after tax': petitioners[0].income_after_tax
-  - 'Household member work address': household_member_work_address_one_line
-  - 'Househould member work name': househould_member_work_name
+  - 'user income after tax': users[0].income_after_tax
+---
+question: |
+  Household Member's Employment Information
+subquestion: |
+  Placeholder text
+fields:
+  - 'Household member work address':     users[0].household_member_work_address_one_line
+  - 'Househould member work name': users[0].househould_member_work_name
 ---
 question: |
   What other facts may be relevant to your ability to pay fees and costs?
 subquestion: |
   Placeholder text
 fields:
-  - 'Petitioner miscellaneous facts': users[0].miscellaneous_facts
+  - 'user miscellaneous facts': users[0].miscellaneous_facts
 ---
 progress: 100
 mandatory: True
@@ -507,78 +529,79 @@ attachment:
     name: Affidavit to Indigency Supplement
     filename: Affidavit_to_Indigency_Supplement
     pdf template file: Affidavit_to_Indigency_Supplement.pdf
+    skip undefined: True
     fields: 
       - "court_name": ${ str(courts[0]) }
-      - "petitioner_name": ${ str(petitioners[0]) }
-      - "petitioner_address_one_line": ${ petitioners[0].address.on_one_line() }
-      - "petitioner_birthdate": ${ petitioners[0].birthdate.format() }
-      - "petitioner_signature": ${ petitioners[0].signature }
-      - "petitioner_address_street": ${ petitioners[0].address.address }
-      - "petitioner_address_city": ${ petitioners[0].address.city }
-      - "petitioner_address_state": ${ petitioners[0].address.state }
-      - "petitioner_address_zip": ${ petitioners[0].address.zip }
+      - "user_name": ${ str(users[0]) }
+      - "user_address_one_line": ${ users[0].address.on_one_line() }
+      - "user_birthdate": ${ users[0].birthdate.format() }
+      - "user_signature": ${ users[0].signature }
+      - "user_address_street": ${ users[0].address.address }
+      - "user_address_city": ${ users[0].address.city }
+      - "user_address_state": ${ users[0].address.state }
+      - "user_address_zip": ${ users[0].address.zip }
       - "signature_date": ${ signature_date }
       - "": ${  }
       - "": ${  }
       - "case_number": ${ case_number }
       - "case_name": ${ case_name }
-      - "petitioner_grade_school_completed": ${ petitioners[0].grade_school_completed }
-      - "petitioner_training": ${ petitioners[0].training }
-      - "petitioner_disabilities": ${ petitioners[0].disabilities }
-      - "petitioner_dependents_number": ${ petitioners[0].dependents_number }
-      - "petitioner_work_address_one_line": ${ petitioners[0].work_address_one_line }
-      - "petitioner_work_name": ${ petitioners[0].work_name }
-      - "petitioner_income_nonemployment": ${ petitioners[0].income_nonemployment }
-      - "petitioner_income_gross_annual": ${ petitioners[0].income_gross_annual }
-      - "petitioner_income_gross_monthly": ${ petitioners[0].income_gross_monthly }
-      - "petitioner_tax_federal": ${ petitioners[0].tax_federal }
-      - "petitioner_tax_state": ${ petitioners[0].tax_state }
-      - "petitioner_tax_social_security": ${ petitioners[0].tax_social_security }
-      - "petitioner_tax_medicare": ${ petitioners[0].tax_medicare }
-      - "petitioner_tax_other": ${ petitioners[0].tax_other }
-      - "petitioner_tax_other_amount": ${ petitioners[0].tax_other_amount }
-      - "petitioner_tax_total": ${ petitioners[0].tax_total }
-      - "petitioner_income_after_tax": ${ petitioners[0].income_after_tax }
-      - "household_member_work_address_one_line": ${ household_member_work_address_one_line }
-      - "househould_member_work_name": ${ househould_member_work_name }
-      - "petitioner_income_after_tax__1": ${ petitioners[0].income_after_tax }
-      - "petitioner_expense_rent": ${ petitioners[0].expense_rent }
-      - "petitioner_expense_uninsured_medical": ${ petitioners[0].expense_uninsured_medical }
-      - "petitioner_expense_food": ${ petitioners[0].expense_food }
-      - "petitioner_expense_childcare": ${ petitioners[0].expense_childcare }
-      - "petitioner_expense_electricity": ${ petitioners[0].expense_electricity }
-      - "petitioner_expense_education": ${ petitioners[0].expense_education }
-      - "petitioner_expense_child_support": ${ petitioners[0].expense_child_support }
-      - "petitioner_expense_gas": ${ petitioners[0].expense_gas }
-      - "petitioner_expense_clothing": ${ petitioners[0].expense_clothing }
-      - "petitioner_expense_oil": ${ petitioners[0].expense_oil }
-      - "petitioner_expense_laundry": ${ petitioners[0].expense_laundry }
-      - "petitioner_expense_water": ${ petitioners[0].expense_water }
-      - "petitioner_expense_car_insurance": ${ petitioners[0].expense_car_insurance }
-      - "petitioner_expense_telephone": ${ petitioners[0].expense_telephone }
-      - "petitioner_expense_health_insurance": ${ petitioners[0].expense_health_insurance }
-      - "petitioner_expense_ransportation": ${ petitioners[0].expense_ransportation }
-      - "petitioner_expense_other": ${ petitioners[0].expense_other }
-      - "petitioner_expense_other_amount": ${ petitioners[0].expense_other_amount }
-      - "petitioner_expense_total": ${ petitioners[0].expense_total }
-      - "petitioner_income_net": ${ petitioners[0].income_net }
-      - "petitioner_owns_home_yes": ${ petitioners[0].owns_home_yes }
-      - "petitioner_owns_home_no": ${ petitioners[0].owns_home_no }
-      - "petitioner_home_value": ${ petitioners[0].home_value }
-      - "petitioner_home_debt": ${ petitioners[0].home_debt }
-      - "petitioner_owns_car_no": ${ petitioners[0].owns_car_no }
-      - "petitioner_owns_car_yes": ${ petitioners[0].owns_car_yes }
-      - "petitioner_car_year": ${ petitioners[0].car_year }
-      - "petitioner_car_make": ${ petitioners[0].car_make }
-      - "petitioner_car_debt": ${ petitioners[0].car_debt }
-      - "petitioner_car_value": ${ petitioners[0].car_value }
-      - "petitioner_accounts_balance": ${ petitioners[0].accounts_balance }
-      - "petitioner_accounts_type": ${ petitioners[0].accounts_type }
-      - "petitioner_property_type": ${ petitioners[0].property_type }
-      - "petitioner_property_value": ${ petitioners[0].property_value }
-      - "petitioner_debts": ${ petitioners[0].debts }
-      - "petitioner_miscellaneous_facts": ${ petitioners[0].miscellaneous_facts }
-      - "petitioner_name_print": ${ petitioners[0].name_print }
+      - "user_grade_school_completed": ${ users[0].grade_school_completed }
+      - "user_training": ${ users[0].training }
+      - "user_disabilities": ${ users[0].disabilities }
+      - "user_dependents_number": ${ users[0].dependents_number }
+      - "user_work_address_one_line": ${ users[0].work_address_one_line }
+      - "user_work_name": ${ users[0].work_name }
+      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_income_gross_annual": ${ users[0].income_gross_annual }
+      - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
+      - "user_tax_federal": ${ users[0].tax_federal }
+      - "user_tax_state": ${ users[0].tax_state }
+      - "user_tax_social_security": ${ users[0].tax_social_security }
+      - "user_tax_medicare": ${ users[0].tax_medicare }
+      - "user_tax_other": ${ users[0].tax_other }
+      - "user_tax_other_amount": ${ users[0].tax_other_amount }
+      - "user_tax_total": ${ users[0].tax_total }
+      - "user_income_after_tax": ${ users[0].income_after_tax }
+      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
+      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_income_after_tax__1": ${ users[0].income_after_tax }
+      - "user_expense_rent": ${ users[0].expense_rent }
+      - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
+      - "user_expense_food": ${ users[0].expense_food }
+      - "user_expense_childcare": ${ users[0].expense_childcare }
+      - "user_expense_electricity": ${ users[0].expense_electricity }
+      - "user_expense_education": ${ users[0].expense_education }
+      - "user_expense_child_support": ${ users[0].expense_child_support }
+      - "user_expense_gas": ${ users[0].expense_gas }
+      - "user_expense_clothing": ${ users[0].expense_clothing }
+      - "user_expense_oil": ${ users[0].expense_oil }
+      - "user_expense_laundry": ${ users[0].expense_laundry }
+      - "user_expense_water": ${ users[0].expense_water }
+      - "user_expense_car_insurance": ${ users[0].expense_car_insurance }
+      - "user_expense_telephone": ${ users[0].expense_telephone }
+      - "user_expense_health_insurance": ${ users[0].expense_health_insurance }
+      - "user_expense_ransportation": ${ users[0].expense_ransportation }
+      - "user_expense_other": ${ users[0].expense_other }
+      - "user_expense_other_amount": ${ users[0].expense_other_amount }
+      - "user_expense_total": ${ users[0].expense_total }
+      - "user_income_net": ${ users[0].income_net }
+      - "user_owns_home_yes": ${ users[0].owns_home_yes }
+      - "user_owns_home_no": ${ not users[0].owns_home_yes }
+      - "user_home_value": ${ users[0].home_value }
+      - "user_home_debt": ${ users[0].home_debt }
+      - "user_owns_car_no": ${ not users[0].owns_car_yes }
+      - "user_owns_car_yes": ${ users[0].owns_car_yes }
+      - "user_car_year": ${ users[0].car_year }
+      - "user_car_make": ${ users[0].car_make }
+      - "user_car_debt": ${ users[0].car_debt }
+      - "user_car_value": ${ users[0].car_value }
+      - "user_accounts_balance": ${ users[0].accounts_balance }
+      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_property_type": ${ users[0].property_type }
+      - "user_property_value": ${ users[0].property_value }
+      - "user_debts": ${ users[0].debts }
+      - "user_miscellaneous_facts": ${ users[0].miscellaneous_facts }
+      - "user_name_print": ${ users[0].name_print }
 ---
 include:
   - docassemble.MAVirtualCourt:basic-questions.yml
@@ -603,31 +626,36 @@ code: |
   user_role = "plaintiff"
   case_number
 
-  petitioners[0].grade_school_completed
-  petitioners[0].dependents_number
-  petitioners[0].tax_federal
-  petitioners[0].income_after_tax
-  petitioners[0].income_after_tax
-  petitioners[0].owns_home_yes
-  petitioners[0].debts
-  petitioners[0].miscellaneous_facts
-  petitioners[0].name_print
+  users[0].grade_school_completed
+  users[0].dependents_number
+  users[0].expense_rent
+  users[0].household_member_work_address_one_line
+  users[0].househould_member_work_name
+  users[0].tax_federal
+  users[0].income_after_tax
+  users[0].owns_home_yes
+  users[0].owns_car_yes
+  users[0].car_loan
+  users[0].car_debt
+  users[0].debts
+  users[0].miscellaneous_facts
+  users[0].name_print
 
   str(courts[0])
-  str(petitioners[0])
-  petitioners[0].address.on_one_line()
-  petitioners[0].birthdate.format()
-  petitioners[0].address.address
-  petitioners[0].address.city
-  petitioners[0].address.state
-  petitioners[0].address.zip
+  str(users[0])
+  users[0].address.on_one_line()
+  users[0].birthdate.format()
+  users[0].address.address
+  users[0].address.city
+  users[0].address.state
+  users[0].address.zip
   signature_date
   # By default, we'll mark any un-filled fields as DAEmpty(). This helps avoid errors if you intentionally hide a logic branch or mark a question not required
   # Comment out the line below if you don't want this behavior. 
   mark_unfilled_fields_empty(interview_metadata["Affidavit_to_Indigency_Supplement0027"])
   Affidavit_to_Indigency_Supplement0027_preview_question # Pre-canned preview screen
   basic_questions_signature_flow
-  petitioners[0].signature
+  users[0].signature
   Affidavit_to_Indigency_Supplement0027 = True
 ---
 continue button field: Affidavit_to_Indigency_Supplement0027_preview_question
@@ -643,76 +671,77 @@ attachment:
     name: Affidavit to Indigency Supplement
     filename: Affidavit_to_Indigency_Supplement
     pdf template file: Affidavit_to_Indigency_Supplement.pdf
+    skip undefined: True
     fields: 
       - "court_name": ${ str(courts[0]) }
-      - "petitioner_name": ${ str(petitioners[0]) }
-      - "petitioner_address_one_line": ${ petitioners[0].address.on_one_line() }
-      - "petitioner_birthdate": ${ petitioners[0].birthdate.format() }
-      - "petitioner_signature": ${ petitioners[0].signature }
-      - "petitioner_address_street": ${ petitioners[0].address.address }
-      - "petitioner_address_city": ${ petitioners[0].address.city }
-      - "petitioner_address_state": ${ petitioners[0].address.state }
-      - "petitioner_address_zip": ${ petitioners[0].address.zip }
+      - "user_name": ${ str(users[0]) }
+      - "user_address_one_line": ${ users[0].address.on_one_line() }
+      - "user_birthdate": ${ users[0].birthdate.format() }
+      - "user_signature": ${ users[0].signature }
+      - "user_address_street": ${ users[0].address.address }
+      - "user_address_city": ${ users[0].address.city }
+      - "user_address_state": ${ users[0].address.state }
+      - "user_address_zip": ${ users[0].address.zip }
       - "signature_date": ${ signature_date }
       - "": ${  }
       - "": ${  }
       - "case_number": ${ case_number }
       - "case_name": ${ case_name }
-      - "petitioner_grade_school_completed": ${ petitioners[0].grade_school_completed }
-      - "petitioner_training": ${ petitioners[0].training }
-      - "petitioner_disabilities": ${ petitioners[0].disabilities }
-      - "petitioner_dependents_number": ${ petitioners[0].dependents_number }
-      - "petitioner_work_address_one_line": ${ petitioners[0].work_address_one_line }
-      - "petitioner_work_name": ${ petitioners[0].work_name }
-      - "petitioner_income_nonemployment": ${ petitioners[0].income_nonemployment }
-      - "petitioner_income_gross_annual": ${ petitioners[0].income_gross_annual }
-      - "petitioner_income_gross_monthly": ${ petitioners[0].income_gross_monthly }
-      - "petitioner_tax_federal": ${ petitioners[0].tax_federal }
-      - "petitioner_tax_state": ${ petitioners[0].tax_state }
-      - "petitioner_tax_social_security": ${ petitioners[0].tax_social_security }
-      - "petitioner_tax_medicare": ${ petitioners[0].tax_medicare }
-      - "petitioner_tax_other": ${ petitioners[0].tax_other }
-      - "petitioner_tax_other_amount": ${ petitioners[0].tax_other_amount }
-      - "petitioner_tax_total": ${ petitioners[0].tax_total }
-      - "petitioner_income_after_tax": ${ petitioners[0].income_after_tax }
-      - "household_member_work_address_one_line": ${ household_member_work_address_one_line }
-      - "househould_member_work_name": ${ househould_member_work_name }
-      - "petitioner_income_after_tax__1": ${ petitioners[0].income_after_tax }
-      - "petitioner_expense_rent": ${ petitioners[0].expense_rent }
-      - "petitioner_expense_uninsured_medical": ${ petitioners[0].expense_uninsured_medical }
-      - "petitioner_expense_food": ${ petitioners[0].expense_food }
-      - "petitioner_expense_childcare": ${ petitioners[0].expense_childcare }
-      - "petitioner_expense_electricity": ${ petitioners[0].expense_electricity }
-      - "petitioner_expense_education": ${ petitioners[0].expense_education }
-      - "petitioner_expense_child_support": ${ petitioners[0].expense_child_support }
-      - "petitioner_expense_gas": ${ petitioners[0].expense_gas }
-      - "petitioner_expense_clothing": ${ petitioners[0].expense_clothing }
-      - "petitioner_expense_oil": ${ petitioners[0].expense_oil }
-      - "petitioner_expense_laundry": ${ petitioners[0].expense_laundry }
-      - "petitioner_expense_water": ${ petitioners[0].expense_water }
-      - "petitioner_expense_car_insurance": ${ petitioners[0].expense_car_insurance }
-      - "petitioner_expense_telephone": ${ petitioners[0].expense_telephone }
-      - "petitioner_expense_health_insurance": ${ petitioners[0].expense_health_insurance }
-      - "petitioner_expense_ransportation": ${ petitioners[0].expense_ransportation }
-      - "petitioner_expense_other": ${ petitioners[0].expense_other }
-      - "petitioner_expense_other_amount": ${ petitioners[0].expense_other_amount }
-      - "petitioner_expense_total": ${ petitioners[0].expense_total }
-      - "petitioner_income_net": ${ petitioners[0].income_net }
-      - "petitioner_owns_home_yes": ${ petitioners[0].owns_home_yes }
-      - "petitioner_owns_home_no": ${ petitioners[0].owns_home_no }
-      - "petitioner_home_value": ${ petitioners[0].home_value }
-      - "petitioner_home_debt": ${ petitioners[0].home_debt }
-      - "petitioner_owns_car_no": ${ petitioners[0].owns_car_no }
-      - "petitioner_owns_car_yes": ${ petitioners[0].owns_car_yes }
-      - "petitioner_car_year": ${ petitioners[0].car_year }
-      - "petitioner_car_make": ${ petitioners[0].car_make }
-      - "petitioner_car_debt": ${ petitioners[0].car_debt }
-      - "petitioner_car_value": ${ petitioners[0].car_value }
-      - "petitioner_accounts_balance": ${ petitioners[0].accounts_balance }
-      - "petitioner_accounts_type": ${ petitioners[0].accounts_type }
-      - "petitioner_property_type": ${ petitioners[0].property_type }
-      - "petitioner_property_value": ${ petitioners[0].property_value }
-      - "petitioner_debts": ${ petitioners[0].debts }
-      - "petitioner_miscellaneous_facts": ${ petitioners[0].miscellaneous_facts }
-      - "petitioner_name_print": ${ petitioners[0].name_print }
+      - "user_grade_school_completed": ${ users[0].grade_school_completed }
+      - "user_training": ${ users[0].training }
+      - "user_disabilities": ${ users[0].disabilities }
+      - "user_dependents_number": ${ users[0].dependents_number }
+      - "user_work_address_one_line": ${ users[0].work_address_one_line }
+      - "user_work_name": ${ users[0].work_name }
+      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_income_gross_annual": ${ users[0].income_gross_annual }
+      - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
+      - "user_tax_federal": ${ users[0].tax_federal }
+      - "user_tax_state": ${ users[0].tax_state }
+      - "user_tax_social_security": ${ users[0].tax_social_security }
+      - "user_tax_medicare": ${ users[0].tax_medicare }
+      - "user_tax_other": ${ users[0].tax_other }
+      - "user_tax_other_amount": ${ users[0].tax_other_amount }
+      - "user_tax_total": ${ users[0].tax_total }
+      - "user_income_after_tax": ${ users[0].income_after_tax }
+      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
+      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_income_after_tax__1": ${ users[0].income_after_tax }
+      - "user_expense_rent": ${ users[0].expense_rent }
+      - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
+      - "user_expense_food": ${ users[0].expense_food }
+      - "user_expense_childcare": ${ users[0].expense_childcare }
+      - "user_expense_electricity": ${ users[0].expense_electricity }
+      - "user_expense_education": ${ users[0].expense_education }
+      - "user_expense_child_support": ${ users[0].expense_child_support }
+      - "user_expense_gas": ${ users[0].expense_gas }
+      - "user_expense_clothing": ${ users[0].expense_clothing }
+      - "user_expense_oil": ${ users[0].expense_oil }
+      - "user_expense_laundry": ${ users[0].expense_laundry }
+      - "user_expense_water": ${ users[0].expense_water }
+      - "user_expense_car_insurance": ${ users[0].expense_car_insurance }
+      - "user_expense_telephone": ${ users[0].expense_telephone }
+      - "user_expense_health_insurance": ${ users[0].expense_health_insurance }
+      - "user_expense_ransportation": ${ users[0].expense_ransportation }
+      - "user_expense_other": ${ users[0].expense_other }
+      - "user_expense_other_amount": ${ users[0].expense_other_amount }
+      - "user_expense_total": ${ users[0].expense_total }
+      - "user_income_net": ${ users[0].income_net }
+      - "user_owns_home_yes": ${ users[0].owns_home_yes }
+      - "user_owns_home_no": ${ not users[0].owns_home_yes }
+      - "user_home_value": ${ users[0].home_value }
+      - "user_home_debt": ${ users[0].home_debt }
+      - "user_owns_car_no": ${ not users[0].owns_car_yes }
+      - "user_owns_car_yes": ${ users[0].owns_car_yes }
+      - "user_car_year": ${ users[0].car_year }
+      - "user_car_make": ${ users[0].car_make }
+      - "user_car_debt": ${ users[0].car_debt }
+      - "user_car_value": ${ users[0].car_value }
+      - "user_accounts_balance": ${ users[0].accounts_balance }
+      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_property_type": ${ users[0].property_type }
+      - "user_property_value": ${ users[0].property_value }
+      - "user_debts": ${ users[0].debts }
+      - "user_miscellaneous_facts": ${ users[0].miscellaneous_facts }
+      - "user_name_print": ${ users[0].name_print }
 ---
