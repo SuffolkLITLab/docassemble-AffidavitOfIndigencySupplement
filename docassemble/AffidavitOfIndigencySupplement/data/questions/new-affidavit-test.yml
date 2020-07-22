@@ -1,0 +1,1007 @@
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['Affidavit_to_Indigency_Supplement0027']"):
+    interview_metadata.initializeObject('Affidavit_to_Indigency_Supplement0027')
+  interview_metadata['Affidavit_to_Indigency_Supplement0027'].update({
+    'title': 'Supplement To Affidavit Of Indigency And Request For Waiver, Substitution Or State Payment Of Fees',
+    'short title': 'Affidavit to Indigency Supplement',
+    'description': 'A MA statute provides that if you cannot pay for court fees or costs, you may be eligible to have the state cover them. If you checked C on the Affidavit of Indigency, you must fill out this form.',
+    'original_form': 'https://www.mass.gov/doc/supplement-to-the-affidavit-of-indigency/download',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Housing Court',
+      'Juvenile Court',
+      'Land Court',
+      'Probate and Family Court',
+      'Superior Court',
+    ],
+    'preferred court': 'Any court (no preferred court)',
+    'categories': [
+      'Other',
+      'Rights of incarcerated/formerly incarcerated',
+      'Indigency',
+    ],
+    'logic block variable': 'Affidavit_to_Indigency_Supplement0027',
+    'attachment block variable': 'Affidavit_to_Indigency_Supplement0027_attachment',
+    'typical role': 'plaintiff',
+    'built_in_fields_used': [
+      {'variable': 'court_name',
+       'transformed_variable': 'str(courts[0])',
+      },
+      {'variable': 'user_name',
+       'transformed_variable': 'str(users[0])',
+      },
+      {'variable': 'user_address_one_line',
+       'transformed_variable': 'users[0].address.on_one_line()',
+      },
+      {'variable': 'user_birthdate',
+       'transformed_variable': 'users[0].birthdate.format()',
+      },
+      {'variable': 'user_signature',
+       'transformed_variable': 'users[0].signature',
+      },
+      {'variable': 'user_address_street',
+       'transformed_variable': 'users[0].address.address',
+      },
+      {'variable': 'user_address_city',
+       'transformed_variable': 'users[0].address.city',
+      },
+      {'variable': 'user_address_state',
+       'transformed_variable': 'users[0].address.state',
+      },
+      {'variable': 'user_address_zip',
+       'transformed_variable': 'users[0].address.zip',
+      },
+      {'variable': 'signature_date',
+       'transformed_variable': 'signature_date',
+      },
+      ],
+    'fields': [
+      {'variable': '',
+       'transformed_variable': '',
+      'field_type': 'yesno',
+      },
+      {'variable': '',
+       'transformed_variable': '',
+      'field_type': 'yesno',
+      },
+      {'variable': 'case_number',
+       'transformed_variable': 'case_number',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'case_name',
+       'transformed_variable': 'case_name',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_grade_school_completed',
+       'transformed_variable': 'users[0].grade_school_completed',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_training',
+       'transformed_variable': 'users[0].training',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_disabilities',
+       'transformed_variable': 'users[0].disabilities',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_dependents_number',
+       'transformed_variable': 'users[0].dependents_number',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_work_address_one_line',
+       'transformed_variable': 'users[0].work_address_one_line',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_work_name',
+       'transformed_variable': 'users[0].work_name',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_income_nonemployment',
+       'transformed_variable': 'users[0].income_nonemployment',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_income_gross_annual',
+       'transformed_variable': 'users[0].income_gross_annual',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_income_gross_monthly',
+       'transformed_variable': 'users[0].income_gross_monthly',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_federal',
+       'transformed_variable': 'users[0].tax_federal',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_state',
+       'transformed_variable': 'users[0].tax_state',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_social_security',
+       'transformed_variable': 'users[0].tax_social_security',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_medicare',
+       'transformed_variable': 'users[0].tax_medicare',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_other',
+       'transformed_variable': 'users[0].tax_other',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_other_amount',
+       'transformed_variable': 'users[0].tax_other_amount',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_tax_total',
+       'transformed_variable': 'users[0].tax_total',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_income_after_tax',
+       'transformed_variable': 'users[0].income_after_tax',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'household_member_work_address_one_line',
+       'transformed_variable': 'household_member_work_address_one_line',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'househould_member_work_name',
+       'transformed_variable': 'househould_member_work_name',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_income_after_tax__1',
+       'transformed_variable': 'users[0].income_after_tax',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_rent',
+       'transformed_variable': 'users[0].expense_rent',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_uninsured_medical',
+       'transformed_variable': 'users[0].expense_uninsured_medical',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_food',
+       'transformed_variable': 'users[0].expense_food',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_childcare',
+       'transformed_variable': 'users[0].expense_childcare',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_electricity',
+       'transformed_variable': 'users[0].expense_electricity',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_education',
+       'transformed_variable': 'users[0].expense_education',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_child_support',
+       'transformed_variable': 'users[0].expense_child_support',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_gas',
+       'transformed_variable': 'users[0].expense_gas',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_clothing',
+       'transformed_variable': 'users[0].expense_clothing',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_oil',
+       'transformed_variable': 'users[0].expense_oil',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_laundry',
+       'transformed_variable': 'users[0].expense_laundry',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_water',
+       'transformed_variable': 'users[0].expense_water',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_car_insurance',
+       'transformed_variable': 'users[0].expense_car_insurance',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_telephone',
+       'transformed_variable': 'users[0].expense_telephone',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_health_insurance',
+       'transformed_variable': 'users[0].expense_health_insurance',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_transportation',
+       'transformed_variable': 'users[0].expense_transportation',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_other',
+       'transformed_variable': 'users[0].expense_other',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_other_amount',
+       'transformed_variable': 'users[0].expense_other_amount',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_expense_total',
+       'transformed_variable': 'users[0].expense_total',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_income_net',
+       'transformed_variable': 'users[0].income_net',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_owns_home_yes',
+       'transformed_variable': 'users[0].owns_home_yes',
+      'field_type': 'yesno',
+      },
+      {'variable': 'user_owns_home_no',
+       'transformed_variable': 'users[0].owns_home_no',
+      'field_type': 'yesno',
+      },
+      {'variable': 'user_home_value',
+       'transformed_variable': 'users[0].home_value',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_home_debt',
+       'transformed_variable': 'users[0].home_debt',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_owns_car_no',
+       'transformed_variable': 'users[0].owns_car_no',
+      'field_type': 'yesno',
+      },
+      {'variable': 'user_owns_car_yes',
+       'transformed_variable': 'users[0].owns_car_yes',
+      'field_type': 'yesno',
+      },
+      {'variable': 'user_car_year',
+       'transformed_variable': 'users[0].car_year',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_car_make',
+       'transformed_variable': 'users[0].car_make',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_car_debt',
+       'transformed_variable': 'users[0].car_debt',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_car_value',
+       'transformed_variable': 'users[0].car_value',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_accounts_balance',
+       'transformed_variable': 'users[0].accounts_balance',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_accounts_type',
+       'transformed_variable': 'users[0].accounts_type',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_property_type',
+       'transformed_variable': 'users[0].property_type',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_property_value',
+       'transformed_variable': 'users[0].property_value',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_debts',
+       'transformed_variable': 'users[0].debts',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_miscellaneous_facts',
+       'transformed_variable': 'users[0].miscellaneous_facts',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      {'variable': 'user_name_print',
+       'transformed_variable': 'users[0].name_print',
+      'field_type': 'text',
+      'field_data_type': 'text',
+      },
+      ],
+  })
+---
+id: interview_order_Affidavit_to_Indigency_Supplement0027
+code: |
+  # This is a placeholder to control logic flow in this interview
+  # It was generated from interview_generator.py as an 'interview order' type question.
+  basic_questions_intro_screen 
+  Affidavit_to_Indigency_Supplement0027_intro
+  # Set the preferred/allowed courts for this interview
+  preferred_court = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["preferred court"]
+  allowed_courts = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["allowed courts"]
+  user_role = "plaintiff"
+  case_number
+
+  users[0].grade_school_completed
+  users[0].training
+  users[0].disabilities
+  users[0].dependents_number
+  users[0].is_employed_yes
+  users[0].income_nonemployment
+  users[0].jobs.gather()
+  for squirrel in users[0].jobs: 
+    log( squirrel.address.address, "console" )
+  log( users[0].jobs, "console" )
+  users[0].living_costs_yes
+  users[0].other_costs_yes
+  users[0].expense_other
+  users[0].household_member_work_address_one_line
+  users[0].househould_member_work_name
+  users[0].tax_federal
+  users[0].income_after_tax
+  users[0].owns_home_yes
+  users[0].owns_car_yes
+  users[0].unpaid_debts_yes
+  users[0].accounts_type
+  users[0].property_type
+  users[0].miscellaneous_facts
+  users[0].name_print
+  users[0].tax_total
+  users[0].expense_total
+
+  str(courts[0])
+  str(users[0])
+  users[0].address.on_one_line()
+  users[0].birthdate.format()
+  users[0].address.address
+  users[0].address.city
+  users[0].address.state
+  users[0].address.zip
+  signature_date
+  # By default, we'll mark any un-filled fields as DAEmpty(). This helps avoid errors if you intentionally hide a logic branch or mark a question not required
+  # Comment out the line below if you don't want this behavior. 
+  mark_unfilled_fields_empty(interview_metadata["Affidavit_to_Indigency_Supplement0027"])
+  Affidavit_to_Indigency_Supplement0027_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  users[0].signature
+  Affidavit_to_Indigency_Supplement0027 = True
+---
+id: debts
+question: |
+  Do you have any unpaid debts?
+subquestion: |
+  If yes, enter debt type and amount
+fields:
+  - no label: users[0].unpaid_debts_yes
+    datatype: yesnoradio
+  - 'Specify all debts': users[0].debts
+    show if: users[0].unpaid_debts_yes 
+---
+id: signature
+question: |
+  Signature
+subquestion: |
+  Placeholder text
+fields:
+  - 'Name': users[0].name_print
+---
+id: tax deductions
+question: |
+  What are you monthly tax deductions?
+fields:
+  - 'Federal tax': users[0].tax_federal
+    datatype: currency
+    default: |
+      0.00
+  - 'State tax': users[0].tax_state
+    datatype: currency
+    default: |
+      0.00
+  - 'Social security tax': users[0].tax_social_security
+    datatype: currency
+    default: |
+      0.00
+  - 'Medicare tax': users[0].tax_medicare
+    datatype: currency
+    default: |
+      0.00
+  - 'Do you have other taxes?': users[0].tax_other_yes
+    datatype: yesnoradio
+  - 'Please specify other taxes': users[0].tax_other
+    show if: users[0].tax_other_yes
+  - 'Other tax total amount': users[0].tax_other_amount
+    show if: users[0].tax_other_yes
+    datatype: currency
+    default: |
+      0.00
+---
+id: tax total calcuation 
+code: |
+  users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
+---
+id: objects
+objects:
+  - users[0].jobs: DAList.using(object_type=Person)
+---
+id: test occupation which might be the real one??
+question: |
+  Question 1 
+fields:
+  - 'Name of Company': users[0].jobs[i].name.text
+  - 'Address': users[0].jobs[i].address.address
+  - 'Occupation': users[0].jobs[i].occupation
+---
+id: test company which might be the real one follow up
+question: |
+  Question 2 
+fields:
+  - 'Do you have another job?': users[0].jobs.there_is_another
+    datatype: yesnoradio
+---
+id: jobs?
+question: |
+  Do you have any jobs? 
+fields:
+  - 'Question 3?': users[0].jobs.there_are_any
+    datatype: yesnoradio
+---
+code: |
+  users[0].jobs.gather()
+---
+id: employment
+# Create Loop or Show If
+question: |
+  Are you currently employed? 
+fields:
+  - no label: users[0].is_employed_yes
+    datatype: yesnoradio
+  - 'Occupation': users[0].occupation
+    show if: users[0].is_employed_yes
+  - 'Employer name': users[0].work_name
+    show if: users[0].is_employed_yes
+  - 'Employer address': users[0].work_address_one_line
+    show if: users[0].is_employed_yes
+comment: |
+    - 'more employment?': users[0].is_employed_2_yes
+      datatype: yesnoradio
+      show if: users[0].is_employed_yes
+    - 'Occupation': users[0].occupation_2
+      show if: users[0].is_employed_2_yes
+    - 'Employer name': users[0].work_name_2
+      show if: users[0].is_employed_2_yes
+    - 'Employer address': users[0].work_address_one_line_2
+      show if: users[0].is_employed_2_yes
+    - 'even more employment?': users[0].is_employed_3_yes
+      datatype: yesnoradio
+      show if: users[0].is_employed_2_yes
+    - 'Occupation': users[0].occupation
+      show if: users[0].is_employed_3_yes
+    - 'Employer name': users[0].work_name
+      show if: users[0].is_employed_3_yes
+    - 'Employer address': users[0].work_address_one_line
+      show if: users[0].is_employed_3_yes
+---
+id: sources of income non-employment
+question: |
+  Do you have any sources of income that are not from employment?
+fields:
+  - no label: users[0].nonemployment_income_yes
+    datatype: yesnoradio
+  - 'Non-employment income': users[0].income_nonemployment
+    show if: users[0].nonemployment_income_yes
+    datatype: currency
+    default: |
+      0.00
+---
+id: income
+question: |
+  What is your income?
+fields:
+  - 'Gross annual income': users[0].income_gross_annual
+    datatype: currency
+    default: |
+      0.00
+  - 'Gross monthly income': users[0].income_gross_monthly
+    datatype: currency
+    default: |
+      0.00
+---
+id: dependents
+question: |
+  How many dependents do you claim?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Number of dependents': users[0].dependents_number
+    default: |
+      0
+---
+id: home
+question: |
+  Do you own a home?
+subquestion: |
+  Placeholder text
+fields:
+  - no label: users[0].owns_home_yes
+    datatype: yesnoradio
+  - 'Home value': users[0].home_value
+    show if: users[0].owns_home_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Home debt': users[0].home_debt
+    show if: users[0].owns_home_yes
+    datatype: currency
+    default: |
+      0.00
+---
+id: car
+question: |
+  Do you own a car?
+subquestion: |
+  Placeholder text
+fields:
+  - no label: users[0].owns_car_yes
+    datatype: yesnoradio
+  - 'Car value': users[0].car_value
+    show if: users[0].owns_car_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Car year': users[0].car_year
+    show if: users[0].owns_car_yes
+  - 'Car make': users[0].car_make
+    show if: users[0].owns_car_yes
+  - 'Do you have any car debt?': users[0].car_loan
+    show if: users[0].owns_car_yes
+    datatype: yesnoradio
+  - 'Car debt amount': users[0].car_debt
+    show if: users[0].car_loan
+    datatype: currency
+    default: |
+      0.00
+---
+#Needs a Loop
+id: bank account
+question: |
+  What bank accounts do you claim?
+fields:
+  - 'Bank account type': users[0].accounts_type
+  - 'Bank account balance': users[0].accounts_balance
+    datatype: currency
+    default: |
+      0.00
+---
+#Needs a loop
+id: property
+question: |
+  What property do you have?
+fields:
+  - 'List all property, including Real Estate': users[0].property_type
+  - 'Property value': users[0].property_value
+    datatype: currency
+    default: |
+      0.00
+---
+id: case information
+question: |
+  What is the information of your case?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Case number': case_number
+  - 'Case name': case_name
+---
+id: education level
+question: |
+  What is your highest level of education completed?
+fields:
+  - no label: users[0].grade_school_completed
+---
+id: special training
+question: |
+  Do you have any special training?
+subquestion: |
+  For Example: (Placeholder Text)
+fields:
+  - no label: users[0].training
+---
+id: disabilities
+question: |
+  Do you have any mental or physical disabilities that affect your earning capacity or living expenses?
+fields:
+  - no label: users[0].disabilities
+---
+id: monthly expenses
+question: |
+  What are your monthly expenses?
+fields:
+  - 'What are your living expenses?': users[0].living_costs_yes
+    datatype: yesnoradio
+  - 'Rent': users[0].expense_rent
+    show if: users[0].living_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Food': users[0].expense_food
+    show if: users[0].living_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Education': users[0].expense_education
+    show if: users[0].living_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Clothing': users[0].expense_clothing
+    show if: users[0].living_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Laundry': users[0].expense_laundry
+    show if: users[0].living_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'What are your monthly utilities?': users[0].utilities_costs_yes
+    datatype: yesnoradio
+  - 'Electricity': users[0].expense_electricity
+    show if: users[0].utilities_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Oil': users[0].expense_oil
+    show if: users[0].utilities_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Water': users[0].expense_water
+    show if: users[0].utilities_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Telephone': users[0].expense_telephone
+    show if: users[0].utilities_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Do you have any medical expenses?': users[0].medical_costs_yes
+    datatype: yesnoradio
+  - 'User health insurance': users[0].expense_health_insurance
+    show if: users[0].medical_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Uninsured medical': users[0].expense_uninsured_medical
+    show if: users[0].medical_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Do you have any childcare expenses?': users[0].childcare_costs_yes
+    datatype: yesnoradio
+  - 'Childcare': users[0].expense_childcare
+    show if: users[0].childcare_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Child support': users[0].expense_child_support
+    show if: users[0].childcare_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Do you have any transportation costs?': users[0].transportation_costs_yes
+    datatype: yesnoradio
+  - 'Car insurance': users[0].expense_car_insurance
+    show if: users[0].transportation_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Gas': users[0].expense_gas
+    show if: users[0].transportation_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Transportation': users[0].expense_transportation
+    show if: users[0].transportation_costs_yes
+    datatype: currency
+    default: |
+      0.00
+---
+id: other monthly expenses
+question: |
+  Do you have other monthly expenses?
+fields:
+  - no label: users[0].other_costs_yes
+    datatype: yesnoradio
+  - 'Other expense': users[0].expense_other
+    show if: users[0].other_costs_yes
+    datatype: currency
+    default: |
+      0.00
+---
+id: expense calculation 
+code: | 
+  users[0].expense_total = users[0].expense_rent + users[0].expense_uninsured_medical + users[0].expense_food + users[0].expense_childcare + users[0].expense_electricity + users[0].expense_education + users[0].expense_child_support + users[0].expense_gas + users[0].expense_clothing + users[0].expense_oil + users[0].expense_laundry + users[0].expense_water + users[0].expense_car_insurance + users[0].expense_telephone + users[0].expense_health_insurance + users[0].expense_transportation 
+---
+#users[0].expense_other + users[0].expense_other_amount
+---
+id: net income calculation 
+code: |
+  users[0].income_net = users[0].income_after_tax -  users[0].expense_total
+---
+id: income after tax calculation 
+code: | 
+   users[0].income_after_tax = users[0].income_gross_monthly - (users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount)
+---
+id: household members
+# Create Loop or Show If
+question: |
+  Household Member's Employment Information
+subquestion: |
+  Placeholder text
+fields:
+  - 'Household member work address':     users[0].household_member_work_address_one_line
+  - 'Househould member work name': users[0].househould_member_work_name
+---
+id: miscellaneous facts
+question: |
+  What other facts may be relevant to your ability to pay fees and costs?
+subquestion: |
+  Placeholder text
+fields:
+  - 'Miscellaneous': users[0].miscellaneous_facts
+---
+progress: 100
+mandatory: True
+question: |
+  Placeholder download screen
+subquestion: |
+  Placeholder
+
+  ### Next steps
+
+  1. Step 1
+  1. Step 2
+
+  Below is a preview of your form.
+
+  ${Affidavit_to_Indigency_Supplement0027_attachment }
+attachment code: Affidavit_to_Indigency_Supplement0027_attachment
+---
+need: Affidavit_to_Indigency_Supplement0027
+attachment:
+    variable name: Affidavit_to_Indigency_Supplement0027_attachment
+    name: Affidavit to Indigency Supplement
+    filename: Affidavit_to_Indigency_Supplement
+    pdf template file: Affidavit_to_Indigency_Supplement.pdf
+    skip undefined: True
+    fields: 
+      - "court_name": ${ str(courts[0]) }
+      - "user_name": ${ str(users[0]) }
+      - "user_address_one_line": ${ users[0].address.on_one_line() }
+      - "user_birthdate": ${ users[0].birthdate.format() }
+      - "user_signature": ${ users[0].signature }
+      - "user_address_street": ${ users[0].address.address }
+      - "user_address_city": ${ users[0].address.city }
+      - "user_address_state": ${ users[0].address.state }
+      - "user_address_zip": ${ users[0].address.zip }
+      - "signature_date": ${ signature_date }
+      - "": ${  }
+      - "": ${  }
+      - "case_number": ${ case_number }
+      - "case_name": ${ case_name }
+      - "user_grade_school_completed": ${ users[0].grade_school_completed }
+      - "user_training": ${ users[0].training }
+      - "user_disabilities": ${ users[0].disabilities }
+      - "user_dependents_number": ${ users[0].dependents_number }
+      - "user_work_address_one_line": ${ users[0].work_address_one_line }
+      - "user_work_name": ${ users[0].work_name }
+      - "user_is_employed_yes": $ { users[0].is_employed_yes }
+      - "user_is_employed_yes": $ { users[0].is_employed_2_yes }
+      - "user_is_employed_yes": $ { users[0].is_employed_3_yes }
+      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_income_gross_annual": ${ users[0].income_gross_annual }
+      - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
+      - "user_tax_federal": ${ users[0].tax_federal }
+      - "user_tax_state": ${ users[0].tax_state }
+      - "user_tax_social_security": ${ users[0].tax_social_security }
+      - "user_tax_medicare": ${ users[0].tax_medicare }
+      - "user_tax_other": ${ users[0].tax_other }
+      - "user_tax_other_amount": ${ users[0].tax_other_amount }
+      - "user_tax_total": ${ users[0].tax_total }
+      - "user_income_after_tax": ${ users[0].income_after_tax }
+      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
+      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_income_after_tax__1": ${ users[0].income_after_tax }
+      - "user_living_costs_yes": ${ users[0].living_costs_yes}
+      - "user_expense_rent": ${ users[0].expense_rent }
+      - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
+      - "user_expense_food": ${ users[0].expense_food }
+      - "user_expense_childcare": ${ users[0].expense_childcare }
+      - "user_expense_electricity": ${ users[0].expense_electricity }
+      - "user_expense_education": ${ users[0].expense_education }
+      - "user_expense_child_support": ${ users[0].expense_child_support }
+      - "user_expense_gas": ${ users[0].expense_gas }
+      - "user_expense_clothing": ${ users[0].expense_clothing }
+      - "user_expense_oil": ${ users[0].expense_oil }
+      - "user_expense_laundry": ${ users[0].expense_laundry }
+      - "user_expense_water": ${ users[0].expense_water }
+      - "user_expense_car_insurance": ${ users[0].expense_car_insurance }
+      - "user_expense_telephone": ${ users[0].expense_telephone }
+      - "user_expense_health_insurance": ${ users[0].expense_health_insurance }
+      - "user_expense_transportation": ${ users[0].expense_transportation }
+      - "user_expense_other": ${ users[0].expense_other }
+      - "user_expense_other_amount": ${ users[0].expense_other_amount }
+      - "user_expense_total": ${ users[0].expense_total }
+      - "user_income_net": ${ users[0].income_net }
+      - "user_owns_home_yes": ${ users[0].owns_home_yes }
+      - "user_owns_home_no": ${ not users[0].owns_home_yes }
+      - "user_home_value": ${ users[0].home_value }
+      - "user_home_debt": ${ users[0].home_debt }
+      - "user_owns_car_yes": ${ users[0].owns_car_yes }
+      - "user_owns_car_no": ${ not users[0].owns_car_yes }
+      - "user_car_year": ${ users[0].car_year }
+      - "user_car_make": ${ users[0].car_make }
+      - "user_car_debt": ${ users[0].car_debt }
+      - "user_car_value": ${ users[0].car_value }
+      - "user_accounts_balance": ${ users[0].accounts_balance }
+      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_property_type": ${ users[0].property_type }
+      - "user_property_value": ${ users[0].property_value }
+      - "user_debts": ${ users[0].debts }
+      - "user_miscellaneous_facts": ${ users[0].miscellaneous_facts }
+      - "user_name_print": ${ users[0].name_print }
+---
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+continue button field: Affidavit_to_Indigency_Supplement0027_intro
+question: |
+  Supplement To Affidavit Of Indigency And Request For Waiver, Substitution Or State Payment Of Fees
+subquestion: |
+  A MA statute provides that if you cannot pay for court fees or costs, you may be eligible to have the state cover them. If you checked C on the Affidavit of Indigency, you must fill out this form.
+---
+continue button field: Affidavit_to_Indigency_Supplement0027_preview_question
+question: |
+  Placeholder preview screen
+subquestion: |
+  Here is a preview of the form you'll sign on the next page. 
+
+   ${Affidavit_to_Indigency_Supplement0027_attachment_preview}
+---
+attachment:
+    variable name: Affidavit_to_Indigency_Supplement0027_attachment_preview
+    name: Affidavit to Indigency Supplement
+    filename: Affidavit_to_Indigency_Supplement
+    pdf template file: Affidavit_to_Indigency_Supplement.pdf
+    skip undefined: True
+    fields: 
+      - "court_name": ${ str(courts[0]) }
+      - "user_name": ${ str(users[0]) }
+      - "user_address_one_line": ${ users[0].address.on_one_line() }
+      - "user_birthdate": ${ users[0].birthdate.format() }
+      - "user_signature": ${ users[0].signature }
+      - "user_address_street": ${ users[0].address.address }
+      - "user_address_city": ${ users[0].address.city }
+      - "user_address_state": ${ users[0].address.state }
+      - "user_address_zip": ${ users[0].address.zip }
+      - "signature_date": ${ signature_date }
+      - "": ${  }
+      - "": ${  }
+      - "case_number": ${ case_number }
+      - "case_name": ${ case_name }
+      - "user_grade_school_completed": ${ users[0].grade_school_completed }
+      - "user_training": ${ users[0].training }
+      - "user_disabilities": ${ users[0].disabilities }
+      - "user_dependents_number": ${ users[0].dependents_number }
+      - "user_work_address_one_line": ${ users[0].work_address_one_line }
+      - "user_work_name": ${ users[0].work_name }
+      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_income_gross_annual": ${ users[0].income_gross_annual }
+      - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
+      - "user_is_employed_yes": $ { users[0].is_employed_yes }
+      - "user_is_employed_yes": $ { users[0].is_employed_2_yes }
+      - "user_is_employed_yes": $ { users[0].is_employed_3_yes }
+      - "user_tax_federal": ${ users[0].tax_federal }
+      - "user_tax_state": ${ users[0].tax_state }
+      - "user_tax_social_security": ${ users[0].tax_social_security }
+      - "user_tax_medicare": ${ users[0].tax_medicare }
+      - "user_tax_other": ${ users[0].tax_other }
+      - "user_tax_other_amount": ${ users[0].tax_other_amount }
+      - "user_tax_total": ${ users[0].tax_total }
+      - "user_income_after_tax": ${ users[0].income_after_tax }
+      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
+      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_income_after_tax__1": ${ users[0].income_after_tax }
+      - "user_living_costs_yes": ${ users[0].living_costs_yes}
+      - "user_expense_rent": ${ users[0].expense_rent }
+      - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
+      - "user_expense_food": ${ users[0].expense_food }
+      - "user_expense_childcare": ${ users[0].expense_childcare }
+      - "user_expense_electricity": ${ users[0].expense_electricity }
+      - "user_expense_education": ${ users[0].expense_education }
+      - "user_expense_child_support": ${ users[0].expense_child_support }
+      - "user_expense_gas": ${ users[0].expense_gas }
+      - "user_expense_clothing": ${ users[0].expense_clothing }
+      - "user_expense_oil": ${ users[0].expense_oil }
+      - "user_expense_laundry": ${ users[0].expense_laundry }
+      - "user_expense_water": ${ users[0].expense_water }
+      - "user_expense_car_insurance": ${ users[0].expense_car_insurance }
+      - "user_expense_telephone": ${ users[0].expense_telephone }
+      - "user_expense_health_insurance": ${ users[0].expense_health_insurance }
+      - "user_expense_transportation": ${ users[0].expense_transportation }
+      - "user_expense_other": ${ users[0].expense_other }
+      - "user_expense_other_amount": ${ users[0].expense_other_amount }
+      - "user_expense_total": ${ users[0].expense_total }
+      - "user_income_net": ${ users[0].income_net }
+      - "user_owns_home_yes": ${ users[0].owns_home_yes }
+      - "user_owns_home_no": ${ not users[0].owns_home_yes }
+      - "user_home_value": ${ users[0].home_value }
+      - "user_home_debt": ${ users[0].home_debt }
+      - "user_owns_car_yes": ${ users[0].owns_car_yes }
+      - "user_owns_car_no": ${ not users[0].owns_car_yes }
+      - "user_car_year": ${ users[0].car_year }
+      - "user_car_make": ${ users[0].car_make }
+      - "user_car_debt": ${ users[0].car_debt }
+      - "user_car_value": ${ users[0].car_value }
+      - "user_accounts_balance": ${ users[0].accounts_balance }
+      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_property_type": ${ users[0].property_type }
+      - "user_property_value": ${ users[0].property_value }
+      - "user_debts": ${ users[0].debts }
+      - "user_miscellaneous_facts": ${ users[0].miscellaneous_facts }
+      - "user_name_print": ${ users[0].name_print }
+---
