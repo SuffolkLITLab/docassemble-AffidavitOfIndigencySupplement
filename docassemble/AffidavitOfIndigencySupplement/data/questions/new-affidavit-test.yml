@@ -378,7 +378,7 @@ code: |
   users[0].disabilities
   users[0].dependents_number
   users[0].is_employed_yes
-  users[0].income_nonemployment
+  users[0].nonemployment_income_yes
   users[0].jobs.gather()
   for squirrel in users[0].jobs: 
     log( squirrel.address.address, "console" )
@@ -474,7 +474,7 @@ id: objects
 objects:
   - users[0].jobs: DAList.using(object_type=Person)
 ---
-id: test occupation which might be the real one??
+id: test occupation that does not work
 question: |
   Question 1 
 fields:
@@ -482,7 +482,7 @@ fields:
   - 'Address': users[0].jobs[i].address.address
   - 'Occupation': users[0].jobs[i].occupation
 ---
-id: test company which might be the real one follow up
+id: test company that does not work follow up
 question: |
   Question 2 
 fields:
