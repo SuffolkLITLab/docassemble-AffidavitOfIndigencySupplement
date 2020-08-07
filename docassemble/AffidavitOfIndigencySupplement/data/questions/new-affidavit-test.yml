@@ -793,12 +793,9 @@ yesno: users[0].household.there_is_another
 code: |
   household_description = comma_and_list([hhmember.occupation + ", " + hhmember.name.text + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
 ---
----
 id: miscellaneous facts
 question: |
   What other facts may be relevant to your ability to pay fees and costs?
-subquestion: |
-  Placeholder text
 fields:
   - 'Miscellaneous': users[0].miscellaneous_facts
 ---
