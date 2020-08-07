@@ -377,19 +377,22 @@ code: |
   users[0].training
   users[0].disabilities
   users[0].dependents_number
-  users[0].is_employed_yes
-  users[0].nonemployment_income_yes
   users[0].jobs.gather()
-  for squirrel in users[0].jobs: 
-    log( squirrel.address.address, "console" )
-  log( users[0].jobs, "console" )
-  users[0].living_costs_yes
-  users[0].other_costs_yes
-  users[0].expense_other
-  users[0].household_member_work_address_one_line
-  users[0].househould_member_work_name
-  users[0].tax_federal
+  jobs_description
+  users[0].income_jobs_gross_monthly
+  users[0].nonemployment.gather()
+  nonemployment_description
+  users[0].income_other_gross_monthly
   users[0].income_after_tax
+  users[0].expense_rent
+  users[0].expense_electricity
+  users[0].expense_health_insurance
+  users[0].expense_childcare
+  users[0].expense_car_insurance
+  users[0].expense_other_yes
+  users[0].household.gather()
+  household_description
+  users[0].tax_federal
   users[0].owns_home_yes
   users[0].owns_car_yes
   users[0].unpaid_debts_yes
@@ -399,6 +402,7 @@ code: |
   users[0].name_print
   users[0].tax_total
   users[0].expense_total
+  users[0].income_net
 
   str(courts[0])
   str(users[0])
@@ -416,6 +420,12 @@ code: |
   basic_questions_signature_flow
   users[0].signature
   Affidavit_to_Indigency_Supplement0027 = True
+---
+id: objects
+objects: 
+  - users[0].jobs: DAList.using(object_type=Person)
+  - users[0].household: DAList.using(object_type=Person)
+  - users[0].nonemployment: DAList.using(object_type=Thing)
 ---
 id: debts
 question: |
@@ -470,98 +480,83 @@ id: tax total calcuation
 code: |
   users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
 ---
-id: objects
-objects:
-  - users[0].jobs: DAList.using(object_type=Person)
----
-id: test occupation that does not work
 question: |
-  Question 1 
-fields:
-  - 'Name of Company': users[0].jobs[i].name.text
-  - 'Address': users[0].jobs[i].address.address
-  - 'Occupation': users[0].jobs[i].occupation
+  Are you currently employed?
+yesno: users[0].jobs.there_are_any
 ---
-id: test company that does not work follow up
 question: |
-  Question 2 
+  Tell us about your ${ ordinal(i) } job
 fields:
-  - 'Do you have another job?': users[0].jobs.there_is_another
-    datatype: yesnoradio
+  - Occupation: users[0].jobs[i].occupation
+  - Employer Name: users[0].jobs[i].name.text
+  - Employer Address: users[0].jobs[i].employer_address
+    address autocomplete: True
 ---
-id: jobs?
 question: |
-  Do you have any jobs? 
-fields:
-  - 'Question 3?': users[0].jobs.there_are_any
-    datatype: yesnoradio
+  Do you have any other jobs?
+yesno: users[0].jobs.there_is_another
 ---
 code: |
-  users[0].jobs.gather()
+  jobs_description = comma_and_list([job.occupation + ", " + job.name.text + ", " + job.employer_address + "\r" for job in users[0].jobs])
 ---
-id: employment
-# Create Loop or Show If
 question: |
-  Are you currently employed? 
-fields:
-  - no label: users[0].is_employed_yes
-    datatype: yesnoradio
-  - 'Occupation': users[0].occupation
-    show if: users[0].is_employed_yes
-  - 'Employer name': users[0].work_name
-    show if: users[0].is_employed_yes
-  - 'Employer address': users[0].work_address_one_line
-    show if: users[0].is_employed_yes
-comment: |
-    - 'more employment?': users[0].is_employed_2_yes
-      datatype: yesnoradio
-      show if: users[0].is_employed_yes
-    - 'Occupation': users[0].occupation_2
-      show if: users[0].is_employed_2_yes
-    - 'Employer name': users[0].work_name_2
-      show if: users[0].is_employed_2_yes
-    - 'Employer address': users[0].work_address_one_line_2
-      show if: users[0].is_employed_2_yes
-    - 'even more employment?': users[0].is_employed_3_yes
-      datatype: yesnoradio
-      show if: users[0].is_employed_2_yes
-    - 'Occupation': users[0].occupation
-      show if: users[0].is_employed_3_yes
-    - 'Employer name': users[0].work_name
-      show if: users[0].is_employed_3_yes
-    - 'Employer address': users[0].work_address_one_line
-      show if: users[0].is_employed_3_yes
+  Do you have income from sources other than employment?
+yesno: users[0].nonemployment.there_are_any
 ---
-id: sources of income non-employment
 question: |
-  Do you have any sources of income that are not from employment?
+  Tell us about your ${ ordinal(i) } source of income
 fields:
-  - no label: users[0].nonemployment_income_yes
-    datatype: yesnoradio
-  - 'Non-employment income': users[0].income_nonemployment
-    show if: users[0].nonemployment_income_yes
-    datatype: currency
-    default: |
-      0.00
+  - Type of income: users[0].nonemployment[i].name.text
 ---
-id: income
 question: |
-  What is your income?
+  Do you have any other sources of income?
+yesno: users[0].nonemployment.there_is_another
+---
+code: |
+  nonemployment_description = comma_and_list([other.name.text + "\r" for other in users[0].nonemployment])
+---
+#Ideally, we can put in the name from their employer
+id: income from jobs with interval choice
+question: |
+  What is your income from (Employer Name) 
 fields:
-  - 'Gross annual income': users[0].income_gross_annual
+  - no label: users[0].income_jobs_interval
+    input type: radio
+    datatype: integer
+    code: period_list()
+  - Amount earned: users[0].income_jobs_amount
     datatype: currency
-    default: |
-      0.00
-  - 'Gross monthly income': users[0].income_gross_monthly
+    default: 0
+---
+code: |
+  users[0].income_jobs_gross_annual = users[0].income_jobs_amount * users[0].income_jobs_interval
+  users[0].income_jobs_gross_monthly = users[0].income_jobs_gross_annual / 12
+---
+code: |
+  users[0].income_other_gross_annual = users[0].income_other_amount * users[0].income_other_interval
+  users[0].income_other_gross_monthly = users[0].income_other_gross_annual / 12
+  users[0].income_gross_monthly = users[0].income_jobs_gross_monthly + users[0].income_other_gross_monthly
+  users[0].income_gross_annual = users[0].income_jobs_gross_annual + users[0].income_other_gross_annual
+---
+id: income from other sources
+question: |
+  Income from other sources
+subquestion: |
+  For example: trust funds, social security benefits, disability benefits, etc.
+fields:
+  - interval: users[0].income_other_interval
+    input type: radio
+    datatype: integer
+    code: period_list()
+  - amount: users[0].income_other_amount
     datatype: currency
-    default: |
-      0.00
+    default: 0
 ---
 id: dependents
 question: |
-  How many dependents do you claim?
+  Do you have any dependents that you claim?
 subquestion: |
-  Placeholder text
+  If yes, enter the number of dependents
 fields:
   - 'Number of dependents': users[0].dependents_number
     default: |
@@ -612,36 +607,29 @@ fields:
     default: |
       0.00
 ---
-#Needs a Loop
 id: bank account
 question: |
-  What bank accounts do you claim?
+  What is the balance of each of your bank accounts?
+subquestion: |
+  For example: checking account $100, savings account $200
 fields:
-  - 'Bank account type': users[0].accounts_type
-  - 'Bank account balance': users[0].accounts_balance
-    datatype: currency
-    default: |
-      0.00
+  - 'Bank accounts': users[0].accounts_type
 ---
-#Needs a loop
+#Talk to SME for guidance
 id: property
 question: |
-  What property do you have?
+  What is the value of your property?
+subquestion: |
+  List all real estate and physical property and its value
+  For example: house $10,000, car $2,000
 fields:
   - 'List all property, including Real Estate': users[0].property_type
-  - 'Property value': users[0].property_value
-    datatype: currency
-    default: |
-      0.00
 ---
-id: case information
 question: |
-  What is the information of your case?
-subquestion: |
-  Placeholder text
+  What is your case name and number?
 fields:
-  - 'Case number': case_number
   - 'Case name': case_name
+  - 'Case number': case_number
 ---
 id: education level
 question: |
@@ -653,107 +641,106 @@ id: special training
 question: |
   Do you have any special training?
 subquestion: |
-  For Example: (Placeholder Text)
+  For example: trade or professional certifications, licenses, etc.
 fields:
   - no label: users[0].training
 ---
 id: disabilities
 question: |
-  Do you have any mental or physical disabilities that affect your earning capacity or living expenses?
+  Do you have any mental or physical disabilities that you wish to disclose to the court?
 fields:
-  - no label: users[0].disabilities
----
-id: monthly expenses
-question: |
-  What are your monthly expenses?
-fields:
-  - 'What are your living expenses?': users[0].living_costs_yes
+  - note: |
+      If yes, explain any mental or physical disabilties that affect your earning capacity or living expenses: 
+  - no label: users[0].disabilities_yes
     datatype: yesnoradio
-  - 'Rent': users[0].expense_rent
-    show if: users[0].living_costs_yes
+  - no label: users[0].disabilities
+    show if: users[0].disabilities_yes
+---
+id: monthly living expenses
+question: |
+  Monthly living expenses
+fields:
+  - 'Rent or Mortgage': users[0].expense_rent
     datatype: currency
     default: |
       0.00
   - 'Food': users[0].expense_food
-    show if: users[0].living_costs_yes
     datatype: currency
     default: |
       0.00
   - 'Education': users[0].expense_education
-    show if: users[0].living_costs_yes
     datatype: currency
     default: |
       0.00
   - 'Clothing': users[0].expense_clothing
-    show if: users[0].living_costs_yes
     datatype: currency
     default: |
       0.00
   - 'Laundry': users[0].expense_laundry
-    show if: users[0].living_costs_yes
     datatype: currency
     default: |
       0.00
-  - 'What are your monthly utilities?': users[0].utilities_costs_yes
-    datatype: yesnoradio
+---
+id: monthly utilities
+question: |
+  Monthly Utilities
+fields: 
   - 'Electricity': users[0].expense_electricity
-    show if: users[0].utilities_costs_yes
     datatype: currency
     default: |
       0.00
   - 'Oil': users[0].expense_oil
-    show if: users[0].utilities_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Water': users[0].expense_water
-    show if: users[0].utilities_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Telephone': users[0].expense_telephone
-    show if: users[0].utilities_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Do you have any medical expenses?': users[0].medical_costs_yes
-    datatype: yesnoradio
-  - 'User health insurance': users[0].expense_health_insurance
-    show if: users[0].medical_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Uninsured medical': users[0].expense_uninsured_medical
-    show if: users[0].medical_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Do you have any childcare expenses?': users[0].childcare_costs_yes
-    datatype: yesnoradio
-  - 'Childcare': users[0].expense_childcare
-    show if: users[0].childcare_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Child support': users[0].expense_child_support
-    show if: users[0].childcare_costs_yes
-    datatype: currency
-    default: |
-      0.00
-  - 'Do you have any transportation costs?': users[0].transportation_costs_yes
-    datatype: yesnoradio
-  - 'Car insurance': users[0].expense_car_insurance
-    show if: users[0].transportation_costs_yes
     datatype: currency
     default: |
       0.00
   - 'Gas': users[0].expense_gas
-    show if: users[0].transportation_costs_yes
+    datatype: currency
+    default: |
+      0.00
+  - 'Water': users[0].expense_water
+    datatype: currency
+    default: |
+      0.00
+  - 'Telephone': users[0].expense_telephone
+    datatype: currency
+    default: |
+      0.00
+---
+id: monthly medical expenses
+question: |
+  Monthly Medical Expenses
+fields:
+  - 'Health insurance premium': users[0].expense_health_insurance
+    datatype: currency
+    default: |
+      0.00
+  - 'Uninsured medical expenses': users[0].expense_uninsured_medical
+    datatype: currency
+    default: |
+      0.00
+---
+id: monthly child care
+question: |
+  Monthly Child Care Expenses
+fields:
+  - 'Childcare': users[0].expense_childcare
+    datatype: currency
+    default: |
+      0.00
+  - 'Child support': users[0].expense_child_support
+    datatype: currency
+    default: |
+      0.00
+---
+id: monthly transportation expenses
+question: |
+  Monthly Transportation Expenses
+fields:
+  - 'Car insurance': users[0].expense_car_insurance
     datatype: currency
     default: |
       0.00
   - 'Transportation': users[0].expense_transportation
-    show if: users[0].transportation_costs_yes
     datatype: currency
     default: |
       0.00
@@ -762,19 +749,21 @@ id: other monthly expenses
 question: |
   Do you have other monthly expenses?
 fields:
-  - no label: users[0].other_costs_yes
+  - no label: users[0].expense_other_yes
     datatype: yesnoradio
-  - 'Other expense': users[0].expense_other
-    show if: users[0].other_costs_yes
+  - note: |
+      Diapers, for example.
+  - 'Describe your remaining expenses': users[0].expense_other
+    show if: users[0].expense_other_yes
+  - 'Other expense': users[0].expense_other_amount
+    show if: users[0].expense_other_yes
     datatype: currency
     default: |
       0.00
 ---
 id: expense calculation 
 code: | 
-  users[0].expense_total = users[0].expense_rent + users[0].expense_uninsured_medical + users[0].expense_food + users[0].expense_childcare + users[0].expense_electricity + users[0].expense_education + users[0].expense_child_support + users[0].expense_gas + users[0].expense_clothing + users[0].expense_oil + users[0].expense_laundry + users[0].expense_water + users[0].expense_car_insurance + users[0].expense_telephone + users[0].expense_health_insurance + users[0].expense_transportation 
----
-#users[0].expense_other + users[0].expense_other_amount
+  users[0].expense_total = users[0].expense_rent + users[0].expense_uninsured_medical + users[0].expense_food + users[0].expense_childcare + users[0].expense_electricity + users[0].expense_education + users[0].expense_child_support + users[0].expense_gas + users[0].expense_clothing + users[0].expense_oil + users[0].expense_laundry + users[0].expense_water + users[0].expense_car_insurance + users[0].expense_telephone + users[0].expense_health_insurance + users[0].expense_transportation + users[0].expense_other_amount
 ---
 id: net income calculation 
 code: |
@@ -785,14 +774,25 @@ code: |
    users[0].income_after_tax = users[0].income_gross_monthly - (users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount)
 ---
 id: household members
-# Create Loop or Show If
 question: |
-  Household Member's Employment Information
-subquestion: |
-  Placeholder text
+  Do you live with a household member that is employed?
+yesno: users[0].household.there_are_any
+---
+question: |
+  Tell us about your ${ ordinal(i) } household member's employment
 fields:
-  - 'Household member work address':     users[0].household_member_work_address_one_line
-  - 'Househould member work name': users[0].househould_member_work_name
+  - Occupation: users[0].household[i].occupation
+  - Employer Name: users[0].household[i].name.text
+  - Employer Address: users[0].household[i].employer_address
+    address autocomplete: True
+---
+question: |
+  Do you have another household member that is employed?
+yesno: users[0].household.there_is_another
+---
+code: |
+  household_description = comma_and_list([hhmember.occupation + ", " + hhmember.name.text + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
+---
 ---
 id: miscellaneous facts
 question: |
@@ -845,12 +845,8 @@ attachment:
       - "user_training": ${ users[0].training }
       - "user_disabilities": ${ users[0].disabilities }
       - "user_dependents_number": ${ users[0].dependents_number }
-      - "user_work_address_one_line": ${ users[0].work_address_one_line }
-      - "user_work_name": ${ users[0].work_name }
-      - "user_is_employed_yes": $ { users[0].is_employed_yes }
-      - "user_is_employed_yes": $ { users[0].is_employed_2_yes }
-      - "user_is_employed_yes": $ { users[0].is_employed_3_yes }
-      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_work_name": ${ jobs_description }
+      - "user_income_nonemployment": ${ nonemployment_description }
       - "user_income_gross_annual": ${ users[0].income_gross_annual }
       - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
       - "user_tax_federal": ${ users[0].tax_federal }
@@ -861,10 +857,10 @@ attachment:
       - "user_tax_other_amount": ${ users[0].tax_other_amount }
       - "user_tax_total": ${ users[0].tax_total }
       - "user_income_after_tax": ${ users[0].income_after_tax }
-      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
-      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_household_member_work_address_one_line": ${ household_description }
+      - "user_househould_member_work_name": ${ household_description }
+      - "user_household_member_occupation": ${ household_description }
       - "user_income_after_tax__1": ${ users[0].income_after_tax }
-      - "user_living_costs_yes": ${ users[0].living_costs_yes}
       - "user_expense_rent": ${ users[0].expense_rent }
       - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
       - "user_expense_food": ${ users[0].expense_food }
@@ -910,7 +906,7 @@ comment: |
   This question is used to introduce your interview. Please customize
 continue button field: Affidavit_to_Indigency_Supplement0027_intro
 question: |
-  Supplement To Affidavit Of Indigency And Request For Waiver, Substitution Or State Payment Of Fees
+  Affidavit Of Indigency Supplement
 subquestion: |
   A MA statute provides that if you cannot pay for court fees or costs, you may be eligible to have the state cover them. If you checked C on the Affidavit of Indigency, you must fill out this form.
 ---
@@ -947,14 +943,10 @@ attachment:
       - "user_training": ${ users[0].training }
       - "user_disabilities": ${ users[0].disabilities }
       - "user_dependents_number": ${ users[0].dependents_number }
-      - "user_work_address_one_line": ${ users[0].work_address_one_line }
-      - "user_work_name": ${ users[0].work_name }
-      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_work_name": ${ jobs_description }
+      - "user_income_nonemployment": ${ nonemployment_description }
       - "user_income_gross_annual": ${ users[0].income_gross_annual }
       - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
-      - "user_is_employed_yes": $ { users[0].is_employed_yes }
-      - "user_is_employed_yes": $ { users[0].is_employed_2_yes }
-      - "user_is_employed_yes": $ { users[0].is_employed_3_yes }
       - "user_tax_federal": ${ users[0].tax_federal }
       - "user_tax_state": ${ users[0].tax_state }
       - "user_tax_social_security": ${ users[0].tax_social_security }
@@ -963,10 +955,10 @@ attachment:
       - "user_tax_other_amount": ${ users[0].tax_other_amount }
       - "user_tax_total": ${ users[0].tax_total }
       - "user_income_after_tax": ${ users[0].income_after_tax }
-      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
-      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_household_member_work_address_one_line": ${ household_description }
+      - "user_househould_member_work_name": ${ household_description }
+      - "user_household_member_occupation": ${ household_description }
       - "user_income_after_tax__1": ${ users[0].income_after_tax }
-      - "user_living_costs_yes": ${ users[0].living_costs_yes}
       - "user_expense_rent": ${ users[0].expense_rent }
       - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
       - "user_expense_food": ${ users[0].expense_food }
