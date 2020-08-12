@@ -373,36 +373,43 @@ code: |
   user_role = "plaintiff"
   case_number
 
-  users[0].grade_school_completed
-  users[0].training
-  users[0].disabilities
-  users[0].dependents_number
-  users[0].jobs.gather()
-  jobs_description
-  users[0].income_jobs_gross_monthly
-  users[0].nonemployment.gather()
-  nonemployment_description
-  users[0].income_other_gross_monthly
-  users[0].income_after_tax
-  users[0].expense_rent
-  users[0].expense_electricity
-  users[0].expense_health_insurance
-  users[0].expense_childcare
-  users[0].expense_car_insurance
-  users[0].expense_other_yes
-  users[0].household.gather()
-  household_description
+  #users[0].grade_school_completed
+  #users[0].training
+  if not users[0].disabilities_yes:
+    users[0].disabilities = 'No Disabilities'
+  #users[0].dependents_number
+  #users[0].jobs.gather()
+  #jobs_description
+  #users[0].income_jobs_gross_monthly
+  #users[0].nonemployment.gather()
+  #nonemployment_description
+  #users[0].income_other_gross_monthly
+  #users[0].income_after_tax
+  #users[0].expense_rent
+  #users[0].expense_electricity
+  #users[0].expense_health_insurance
+  #users[0].expense_childcare
+  #users[0].expense_car_insurance
+  if not users[0].expense_other_yes:
+    users[0].expense_other = 'No Other Expenses'
+    users[0].expense_other_amount = '0'
+  #users[0].household.gather()
+  #household_description
   users[0].tax_federal
+  if not users[0].tax_other_yes:
+    users[0].tax_other = 'No Other Taxes'
+    users[0].tax_other_amount = '0'
   users[0].owns_home_yes
   users[0].owns_car_yes
-  users[0].unpaid_debts_yes
-  users[0].accounts_type
-  users[0].property_type
-  users[0].miscellaneous_facts
-  users[0].name_print
-  users[0].tax_total
-  users[0].expense_total
-  users[0].income_net
+  if not users[0].unpaid_debts_yes: 
+    users[0].debts = 'No Debts'
+  #users[0].accounts_type
+  #users[0].property_type
+  #users[0].miscellaneous_facts
+  #users[0].name_print
+  #users[0].tax_total
+  #users[0].expense_total
+  #users[0].income_net
 
   str(courts[0])
   str(users[0])
@@ -436,7 +443,7 @@ fields:
   - no label: users[0].unpaid_debts_yes
     datatype: yesnoradio
   - 'Specify all debts': users[0].debts
-    show if: users[0].unpaid_debts_yes 
+    show if: users[0].unpaid_debts_yes
 ---
 id: signature
 question: |
@@ -554,13 +561,10 @@ fields:
 ---
 id: dependents
 question: |
-  Do you have any dependents that you claim?
-subquestion: |
-  If yes, enter the number of dependents
-fields:
-  - 'Number of dependents': users[0].dependents_number
-    default: |
-      0
+  How many dependents do you claim?
+fields: 
+  - no label: users[0].dependents_number
+    datatype: integer
 ---
 id: home
 question: |
@@ -639,7 +643,7 @@ fields:
 ---
 id: special training
 question: |
-  Do you have any special training?
+  List any special training you have
 subquestion: |
   For example: trade or professional certifications, licenses, etc.
 fields:
@@ -647,13 +651,13 @@ fields:
 ---
 id: disabilities
 question: |
-  Do you have any mental or physical disabilities that you wish to disclose to the court?
+  If you have disabilities, do they affect your earning capacity?
 fields:
-  - note: |
-      If yes, explain any mental or physical disabilties that affect your earning capacity or living expenses: 
   - no label: users[0].disabilities_yes
     datatype: yesnoradio
   - no label: users[0].disabilities
+    show if: users[0].disabilities_yes
+  - note: If yes, explain any mental or physical disabilties that affect your earning capacity or living expense.
     show if: users[0].disabilities_yes
 ---
 id: monthly living expenses
@@ -781,8 +785,9 @@ yesno: users[0].household.there_are_any
 question: |
   Tell us about your ${ ordinal(i) } household member's employment
 fields:
+  - Name of Household Member: users[0].household[i].name.text
   - Occupation: users[0].household[i].occupation
-  - Employer Name: users[0].household[i].name.text
+  - Employer Name: users[0].household[i].name.employer
   - Employer Address: users[0].household[i].employer_address
     address autocomplete: True
 ---
@@ -791,13 +796,15 @@ question: |
 yesno: users[0].household.there_is_another
 ---
 code: |
-  household_description = comma_and_list([hhmember.occupation + ", " + hhmember.name.text + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
+  household_description = comma_and_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
 ---
 id: miscellaneous facts
 question: |
   What other facts may be relevant to your ability to pay fees and costs?
 fields:
   - 'Miscellaneous': users[0].miscellaneous_facts
+    input type: area
+    rows: 4
 ---
 progress: 100
 mandatory: True
