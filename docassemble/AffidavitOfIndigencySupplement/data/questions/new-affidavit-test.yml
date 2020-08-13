@@ -373,28 +373,28 @@ code: |
   user_role = "plaintiff"
   case_number
 
-  #users[0].grade_school_completed
-  #users[0].training
+  users[0].grade_school_completed
+  users[0].training
   if not users[0].disabilities_yes:
     users[0].disabilities = 'No Disabilities'
-  #users[0].dependents_number
-  #users[0].jobs.gather()
-  #jobs_description
-  #users[0].income_jobs_gross_monthly
-  #users[0].nonemployment.gather()
-  #nonemployment_description
-  #users[0].income_other_gross_monthly
-  #users[0].income_after_tax
-  #users[0].expense_rent
-  #users[0].expense_electricity
-  #users[0].expense_health_insurance
-  #users[0].expense_childcare
-  #users[0].expense_car_insurance
+  users[0].dependents_number
+  users[0].jobs.gather()
+  jobs_description
+  users[0].income_jobs_gross_monthly
+  users[0].nonemployment.gather()
+  nonemployment_description
+  users[0].income_other_gross_monthly
+  users[0].income_after_tax
+  users[0].expense_rent
+  users[0].expense_electricity
+  users[0].expense_health_insurance
+  users[0].expense_childcare
+  users[0].expense_car_insurance
   if not users[0].expense_other_yes:
     users[0].expense_other = 'No Other Expenses'
     users[0].expense_other_amount = '0'
-  #users[0].household.gather()
-  #household_description
+  users[0].household.gather()
+  household_description
   users[0].tax_federal
   if not users[0].tax_other_yes:
     users[0].tax_other = 'No Other Taxes'
@@ -403,13 +403,13 @@ code: |
   users[0].owns_car_yes
   if not users[0].unpaid_debts_yes: 
     users[0].debts = 'No Debts'
-  #users[0].accounts_type
-  #users[0].property_type
-  #users[0].miscellaneous_facts
-  #users[0].name_print
-  #users[0].tax_total
-  #users[0].expense_total
-  #users[0].income_net
+  users[0].accounts_type
+  users[0].property_type
+  users[0].miscellaneous_facts
+  users[0].name_print
+  users[0].tax_total
+  users[0].expense_total
+  users[0].income_net
 
   str(courts[0])
   str(users[0])
@@ -458,30 +458,30 @@ question: |
   What are you monthly tax deductions?
 fields:
   - 'Federal tax': users[0].tax_federal
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'State tax': users[0].tax_state
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Social security tax': users[0].tax_social_security
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Medicare tax': users[0].tax_medicare
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Do you have other taxes?': users[0].tax_other_yes
     datatype: yesnoradio
   - 'Please specify other taxes': users[0].tax_other
     show if: users[0].tax_other_yes
   - 'Other tax total amount': users[0].tax_other_amount
     show if: users[0].tax_other_yes
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: tax total calcuation 
 code: |
@@ -532,7 +532,7 @@ fields:
     datatype: integer
     code: period_list()
   - Amount earned: users[0].income_jobs_amount
-    datatype: currency
+    datatype: integer
     default: 0
 ---
 code: |
@@ -556,7 +556,7 @@ fields:
     datatype: integer
     code: period_list()
   - amount: users[0].income_other_amount
-    datatype: currency
+    datatype: integer
     default: 0
 ---
 id: dependents
@@ -576,14 +576,14 @@ fields:
     datatype: yesnoradio
   - 'Home value': users[0].home_value
     show if: users[0].owns_home_yes
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Home debt': users[0].home_debt
     show if: users[0].owns_home_yes
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: car
 question: |
@@ -595,9 +595,9 @@ fields:
     datatype: yesnoradio
   - 'Car value': users[0].car_value
     show if: users[0].owns_car_yes
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Car year': users[0].car_year
     show if: users[0].owns_car_yes
   - 'Car make': users[0].car_make
@@ -607,9 +607,9 @@ fields:
     datatype: yesnoradio
   - 'Car debt amount': users[0].car_debt
     show if: users[0].car_loan
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: bank account
 question: |
@@ -665,89 +665,89 @@ question: |
   Monthly living expenses
 fields:
   - 'Rent or Mortgage': users[0].expense_rent
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Food': users[0].expense_food
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
-  - 'Education': users[0].expense_education
-    datatype: currency
-    default: |
-      0.00
+      0
   - 'Clothing': users[0].expense_clothing
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Laundry': users[0].expense_laundry
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: monthly utilities
 question: |
   Monthly Utilities
 fields: 
   - 'Electricity': users[0].expense_electricity
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Oil': users[0].expense_oil
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Gas': users[0].expense_gas
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Water': users[0].expense_water
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Telephone': users[0].expense_telephone
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: monthly medical expenses
 question: |
   Monthly Medical Expenses
 fields:
   - 'Health insurance premium': users[0].expense_health_insurance
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Uninsured medical expenses': users[0].expense_uninsured_medical
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: monthly child care
 question: |
   Monthly Child Care Expenses
 fields:
+  - 'Education': users[0].expense_education
+    datatype: integer
+    default: |
+      0
   - 'Childcare': users[0].expense_childcare
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Child support': users[0].expense_child_support
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: monthly transportation expenses
 question: |
   Monthly Transportation Expenses
 fields:
   - 'Car insurance': users[0].expense_car_insurance
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
   - 'Transportation': users[0].expense_transportation
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: other monthly expenses
 question: |
@@ -761,9 +761,9 @@ fields:
     show if: users[0].expense_other_yes
   - 'Other expense': users[0].expense_other_amount
     show if: users[0].expense_other_yes
-    datatype: currency
+    datatype: integer
     default: |
-      0.00
+      0
 ---
 id: expense calculation 
 code: | 
@@ -790,13 +790,14 @@ fields:
   - Employer Name: users[0].household[i].name.employer
   - Employer Address: users[0].household[i].employer_address
     address autocomplete: True
+  #- Monthly Income: users[0].household[i].household_income
 ---
 question: |
   Do you have another household member that is employed?
 yesno: users[0].household.there_is_another
 ---
 code: |
-  household_description = comma_and_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
+  household_description = comma_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
 ---
 id: miscellaneous facts
 question: |
@@ -861,9 +862,7 @@ attachment:
       - "user_tax_other_amount": ${ users[0].tax_other_amount }
       - "user_tax_total": ${ users[0].tax_total }
       - "user_income_after_tax": ${ users[0].income_after_tax }
-      - "user_household_member_work_address_one_line": ${ household_description }
       - "user_househould_member_work_name": ${ household_description }
-      - "user_household_member_occupation": ${ household_description }
       - "user_income_after_tax__1": ${ users[0].income_after_tax }
       - "user_expense_rent": ${ users[0].expense_rent }
       - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
@@ -959,9 +958,7 @@ attachment:
       - "user_tax_other_amount": ${ users[0].tax_other_amount }
       - "user_tax_total": ${ users[0].tax_total }
       - "user_income_after_tax": ${ users[0].income_after_tax }
-      - "user_household_member_work_address_one_line": ${ household_description }
       - "user_househould_member_work_name": ${ household_description }
-      - "user_household_member_occupation": ${ household_description }
       - "user_income_after_tax__1": ${ users[0].income_after_tax }
       - "user_expense_rent": ${ users[0].expense_rent }
       - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
