@@ -371,38 +371,43 @@ code: |
   preferred_court = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["preferred court"]
   allowed_courts = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["allowed courts"]
   user_role = "plaintiff"
-  case_number
+  #case_number
 
-  users[0].grade_school_completed
-  users[0].training
-  users[0].disabilities
-  users[0].dependents_number
+  #users[0].grade_school_completed
+  #users[0].training
+  #users[0].disabilities
+  #users[0].dependents_number
+  users[0].jobs.there_are_any
+  users[0].nonemployment.there_are_any
   users[0].jobs.gather()
-  jobs_description
-  users[0].income_jobs_gross_monthly
   users[0].nonemployment.gather()
+  jobs_description
   nonemployment_description
-  users[0].income_other_gross_monthly
-  users[0].income_after_tax
-  users[0].expense_rent
-  users[0].expense_electricity
-  users[0].expense_health_insurance
-  users[0].expense_childcare
-  users[0].expense_car_insurance
-  users[0].expense_other_yes
-  users[0].household.gather()
-  household_description
-  users[0].tax_federal
-  users[0].owns_home_yes
-  users[0].owns_car_yes
-  users[0].unpaid_debts_yes
-  users[0].accounts_type
-  users[0].property_type
-  users[0].miscellaneous_facts
-  users[0].name_print
-  users[0].tax_total
-  users[0].expense_total
-  users[0].income_net
+  users[0].has_fixed_expenses
+  users[0].has_variable_expenses
+  users[0].has_health_expenses
+  users[0].has_transport_expenses
+  users[0].has_child_expenses
+  #users[0].income_after_tax
+  #users[0].expense_rent
+  #users[0].expense_electricity
+  #users[0].expense_health_insurance
+  #users[0].expense_childcare
+  #users[0].expense_car_insurance
+  #users[0].expense_other_yes
+  #users[0].household.gather()
+  #household_description
+  #users[0].tax_federal
+  #users[0].owns_home_yes
+  #users[0].owns_car_yes
+  #users[0].unpaid_debts_yes
+  #users[0].accounts_type
+  #users[0].property_type
+  #users[0].miscellaneous_facts
+  #users[0].name_print
+  #users[0].tax_total
+  #users[0].expense_total
+  #users[0].income_net
 
   str(courts[0])
   str(users[0])
@@ -446,111 +451,103 @@ subquestion: |
 fields:
   - 'Name': users[0].name_print
 ---
-id: tax deductions
+comment: |
+  id: tax total calcuation 
+  code: |
+    users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
+---
+id: income sources
 question: |
-  What are you monthly tax deductions?
+  How did you make money in the last 12 months?
 fields:
-  - 'Federal tax': users[0].tax_federal
-    datatype: currency
-    default: |
-      0.00
-  - 'State tax': users[0].tax_state
-    datatype: currency
-    default: |
-      0.00
-  - 'Social security tax': users[0].tax_social_security
-    datatype: currency
-    default: |
-      0.00
-  - 'Medicare tax': users[0].tax_medicare
-    datatype: currency
-    default: |
-      0.00
-  - 'Do you have other taxes?': users[0].tax_other_yes
-    datatype: yesnoradio
-  - 'Please specify other taxes': users[0].tax_other
-    show if: users[0].tax_other_yes
-  - 'Other tax total amount': users[0].tax_other_amount
-    show if: users[0].tax_other_yes
-    datatype: currency
-    default: |
-      0.00
+  - Employed by myself or someone else: users[0].jobs.there_are_any
+    datatype: yesnowide
+  - Nonemployment income: users[0].nonemployment.there_are_any
+    datatype: yesnowide
 ---
-id: tax total calcuation 
-code: |
-  users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
----
+id: job loop collect
 question: |
-  Are you currently employed?
-yesno: users[0].jobs.there_are_any
----
-question: |
-  Tell us about your ${ ordinal(i) } job
+  Describe your job
 fields:
   - Occupation: users[0].jobs[i].occupation
   - Employer Name: users[0].jobs[i].name.text
   - Employer Address: users[0].jobs[i].employer_address
     address autocomplete: True
+  - Income from the last 12 months: users[0].jobs[i].income_amount
+    datatype: currency
+    min: 0
+    default: 0
+  - Federal tax: users[0].jobs[i].tax_federal
+    datatype: currency
+    min: 0
+    default: 0
+  - State tax: users[0].jobs[i].tax_state
+    datatype: currency
+    min: 0
+    default: 0
+  - Social security tax: users[0].jobs[i].tax_social_security
+    datatype: currency
+    min: 0
+    default: 0
+  - Medicare tax: users[0].jobs[i].tax_medicare
+    datatype: currency
+    min: 0
+    default: 0
+  - Do you have other taxes?: users[0].jobs[i].tax_other_yes
+    datatype: yesnoradio
+  - Other: users[0].jobs[i].tax_other
+    show if: users[0].jobs[i].tax_other_yes
+  - Other tax amount: users[0].jobs[i].tax_other_amount
+    show if: users[0].jobs[i].tax_other_yes
+    datatype: currency
+    min: 0
+    default: 0
+list collect: True
 ---
+# uses combobox with nonemployment sources of income
+id: nonemployment income
 question: |
-  Do you have any other jobs?
-yesno: users[0].jobs.there_is_another
----
-code: |
-  jobs_description = comma_and_list([job.occupation + ", " + job.name.text + ", " + job.employer_address + "\r" for job in users[0].jobs])
----
-question: |
-  Do you have income from sources other than employment?
-yesno: users[0].nonemployment.there_are_any
----
-question: |
-  Tell us about your ${ ordinal(i) } source of income
+  Nonemployment income
+subquestion: |
+  What did you receive in the last 12 months?
 fields:
   - Type of income: users[0].nonemployment[i].name.text
----
-question: |
-  Do you have any other sources of income?
-yesno: users[0].nonemployment.there_is_another
----
-code: |
-  nonemployment_description = comma_and_list([other.name.text + "\r" for other in users[0].nonemployment])
----
-#Ideally, we can put in the name from their employer
-id: income from jobs with interval choice
-question: |
-  What is your income from (Employer Name) 
-fields:
-  - no label: users[0].income_jobs_interval
-    input type: radio
-    datatype: integer
-    code: period_list()
-  - Amount earned: users[0].income_jobs_amount
+    input type: dropdown
+    choices:
+      - royalties
+      - rental income
+      - interest
+      - dividends
+      - trusts
+      - annuities
+      - pensions
+      - retirement
+      - workers comp
+      - private disability insurance
+      - child support
+      - alimony
+      - contributions
+  - Amount: users[0].nonemployment[i].income_amount
     datatype: currency
+    min: 0
     default: 0
+list collect: True
 ---
+# code for gross annual and monthly income, adding jobs and nonemployment income loops
 code: |
-  users[0].income_jobs_gross_annual = users[0].income_jobs_amount * users[0].income_jobs_interval
-  users[0].income_jobs_gross_monthly = users[0].income_jobs_gross_annual / 12
----
-code: |
-  users[0].income_other_gross_annual = users[0].income_other_amount * users[0].income_other_interval
-  users[0].income_other_gross_monthly = users[0].income_other_gross_annual / 12
-  users[0].income_gross_monthly = users[0].income_jobs_gross_monthly + users[0].income_other_gross_monthly
+  users[0].income_jobs_gross_annual = 0
+  for jobs in users[0].jobs:
+    users[0].income_jobs_gross_annual = users[0].income_jobs_gross_annual + jobs.income_amount
+  users[0].income_other_gross_annual = 0
+  for other in users[0].nonemployment:
+    users[0].income_other_gross_annual = users[0].income_other_gross_annual + other.income_amount
   users[0].income_gross_annual = users[0].income_jobs_gross_annual + users[0].income_other_gross_annual
+  users[0].income_gross_monthly = users[0].income_gross_annual / 12
 ---
-id: income from other sources
-question: |
-  Income from other sources
-subquestion: |
-  For example: trust funds, social security benefits, disability benefits, etc.
-fields:
-  - interval: users[0].income_other_interval
-    input type: radio
-    datatype: integer
-    code: period_list()
-  - amount: users[0].income_other_amount
-    datatype: currency
-    default: 0
+# makes text from loops to print on form
+code: |
+  jobs_description = comma_and_list([job.occupation + ", " + job.name.text + ", " + job.employer_address + "\r" for job in users[0].jobs])
+  nonemployment_description = comma_and_list([other.name.text + "\r" for other in users[0].nonemployment])
 ---
 id: dependents
 question: |
@@ -656,94 +653,110 @@ fields:
   - no label: users[0].disabilities
     show if: users[0].disabilities_yes
 ---
-id: monthly living expenses
+id: expenses control
 question: |
-  Monthly living expenses
+  What expenses did you pay in the last 12 months?
 fields:
-  - 'Rent or Mortgage': users[0].expense_rent
-    datatype: currency
-    default: |
-      0.00
-  - 'Food': users[0].expense_food
-    datatype: currency
-    default: |
-      0.00
-  - 'Education': users[0].expense_education
-    datatype: currency
-    default: |
-      0.00
-  - 'Clothing': users[0].expense_clothing
-    datatype: currency
-    default: |
-      0.00
-  - 'Laundry': users[0].expense_laundry
-    datatype: currency
-    default: |
-      0.00
+  - Rent, Mortgage, Utilities: users[0].has_fixed_expenses
+    datatype: yesnowide
+  - Health insurance and Uninsured Medical Expenses,: users[0].has_health_expenses
+    datatype: yesnowide
+  - Food, Clothing, Laundry, Cleaning, Telephone: users[0].has_variable_expenses
+    datatype: yesnowide
+  - Transportation, Car Insurance: users[0].has_transport_expenses
+    datatype: yesnowide
+  - Child Education, Child Support, Child Care: users[0].has_child_expenses
+    datatype: yesnowide
 ---
-id: monthly utilities
-question: |
-  Monthly Utilities
-fields: 
-  - 'Electricity': users[0].expense_electricity
-    datatype: currency
-    default: |
-      0.00
-  - 'Oil': users[0].expense_oil
-    datatype: currency
-    default: |
-      0.00
-  - 'Gas': users[0].expense_gas
-    datatype: currency
-    default: |
-      0.00
-  - 'Water': users[0].expense_water
-    datatype: currency
-    default: |
-      0.00
-  - 'Telephone': users[0].expense_telephone
-    datatype: currency
-    default: |
-      0.00
----
-id: monthly medical expenses
-question: |
-  Monthly Medical Expenses
+id: fixed expenses amount
+question: "Fixed expenses"
+subquestion: "How much did you pay in the last 12 months?"
 fields:
-  - 'Health insurance premium': users[0].expense_health_insurance
+  - Rent or Mortgage: users[0].expense_rent
     datatype: currency
-    default: |
-      0.00
-  - 'Uninsured medical expenses': users[0].expense_uninsured_medical
+    default: 0
+    min: 0
+  - note: "Utilities"
+  - Electricity: users[0].expense_electricity
     datatype: currency
-    default: |
-      0.00
+    default: 0
+    min: 0
+  - Oil: users[0].expense_oil
+    datatype: currency
+    default: 0
+    min: 0
+  - Gas: users[0].expense_gas
+    datatype: currency
+    default: 0
+    min: 0
+  - Water: users[0].expense_water
+    datatype: currency
+    default: 0
+    min: 0
 ---
-id: monthly child care
-question: |
-  Monthly Child Care Expenses
+id: health expenses amount
+question: "Health"
+subquestion: "How much did you pay in the last 12 months?"
 fields:
-  - 'Childcare': users[0].expense_childcare
+  - Uninsured medical expenses: users[0].expense_uninsured_medical
     datatype: currency
-    default: |
-      0.00
-  - 'Child support': users[0].expense_child_support
+    default: 0
+    min: 0
+  - Health insurance: users[0].expense_health_insurance
     datatype: currency
-    default: |
-      0.00
+    default: 0
+    min: 0
 ---
-id: monthly transportation expenses
-question: |
-  Monthly Transportation Expenses
+id: variable expenses amount
+question: "Variable expenses"
+subquestion: "How much did you spend in the last 12 months?"
 fields:
-  - 'Car insurance': users[0].expense_car_insurance
+  - Food: users[0].expense_food
     datatype: currency
-    default: |
-      0.00
-  - 'Transportation': users[0].expense_transportation
+    default: 0
+    min: 0
+  - Clothing: users[0].expense_clothing
     datatype: currency
-    default: |
-      0.00
+    default: 0
+    min: 0
+  - Laundry and Cleaning: users[0].expense_laundry
+    datatype: currency
+    default: 0
+    min: 0
+  - Telephone: users[0].expense_telephone
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: transport expenses
+question: "Transportation"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Transportation Expenses: users[0].expense_transportation
+    datatype: currency
+    default: 0
+    min: 0  
+  - Car insurance: users[0].expense_car_insurance
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: child related expenses
+question: "Expenses related to children"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Child Care: users[0].expense_childcare
+    datatype: currency
+    default: 0
+    min: 0
+  - Child Support: users[0].expense_child_support
+    datatype: currency
+    default: 0
+    min: 0
+  - Education Expenses for Children: users[0].expense_education
+    datatype: currency
+    default: 0
+    min: 0
 ---
 id: other monthly expenses
 question: |
@@ -782,7 +795,7 @@ question: |
   Tell us about your ${ ordinal(i) } household member's employment
 fields:
   - Occupation: users[0].household[i].occupation
-  - Employer Name: users[0].household[i].name.text
+  - Employer Name: users[0].household[i].name
   - Employer Address: users[0].household[i].employer_address
     address autocomplete: True
 ---

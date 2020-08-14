@@ -53,7 +53,7 @@ setup(name='docassemble.AffidavitOfIndigencySupplement',
       url='https://docassemble.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
-      install_requires=[],
+      install_requires=['docassemble.MAVirtualCourt'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/AffidavitOfIndigencySupplement/', package='docassemble.AffidavitOfIndigencySupplement'),
      )
