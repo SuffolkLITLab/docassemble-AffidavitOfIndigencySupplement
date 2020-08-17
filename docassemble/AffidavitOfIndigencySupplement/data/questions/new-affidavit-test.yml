@@ -384,16 +384,21 @@ code: |
   jobs_description
   nonemployment_description
   users[0].income_gross_monthly
+  users[0].tax_total
   users[0].income_after_tax
+  users[0].has_fixed_expenses
+  users[0].has_variable_expenses
+  users[0].has_health_expenses
+  users[0].has_transport_expenses
+  users[0].has_child_expenses
+  users[0].expense_total
+  users[0].income_net
   if not users[0].expense_other_yes:
     users[0].expense_other = 'No Other Expenses'
     users[0].expense_other_amount = '0'
   users[0].household.gather()
   household_description
   users[0].tax_federal
-  if not users[0].tax_other_yes:
-    users[0].tax_other = 'No Other Taxes'
-    users[0].tax_other_amount = '0'
   users[0].owns_home_yes
   users[0].owns_car_yes
   if not users[0].unpaid_debts_yes: 
@@ -402,9 +407,6 @@ code: |
   users[0].property_type
   users[0].miscellaneous_facts
   users[0].name_print
-  users[0].tax_total
-  users[0].expense_total
-  users[0].income_net
 
   str(courts[0])
   str(users[0])
@@ -562,6 +564,127 @@ code: |
   users[0].tax_social_security = users[0].tax_gross_annual_social_security /12
   users[0].tax_medicare = users[0].tax_gross_annual_medicare / 12
   users[0].tax_other_amount = users[0].tax_gross_annual_other / 12
+  users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
+---
+id: expenses control
+question: |
+  What expenses did you pay in the last 12 months?
+fields:
+  - Rent, Mortgage, and Utilities: users[0].has_fixed_expenses
+    datatype: yesnowide
+  - Health insurance and Uninsured Medical Expenses,: users[0].has_health_expenses
+    datatype: yesnowide
+  - Food, Clothing, Laundry, Cleaning, and Telephone: users[0].has_variable_expenses
+    datatype: yesnowide
+  - Transportation and Car Insurance: users[0].has_transport_expenses
+    datatype: yesnowide
+  - Child Education, Child Support, and Child Care: users[0].has_child_expenses
+    datatype: yesnowide
+  - Other Expenses: users[0].expense_other_yes
+    datatype: yesnowide
+---
+id: fixed expenses amount
+question: "Fixed expenses"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Rent or Mortgage: users[0].expense_rent
+    datatype: currency    
+    default: 0
+    min: 0
+  - Electricity: users[0].expense_electricity
+    datatype: currency
+    default: 0
+    min: 0
+  - Oil: users[0].expense_oil
+    datatype: currency
+    default: 0
+    min: 0
+  - Gas: users[0].expense_gas
+    datatype: currency
+    default: 0
+    min: 0
+  - Water: users[0].expense_water
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: health expenses amount
+question: "Health"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Uninsured medical expenses: users[0].expense_uninsured_medical
+    datatype: currency
+    default: 0
+    min: 0
+  - Health insurance: users[0].expense_health_insurance
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: variable expenses amount
+question: "Variable expenses"
+subquestion: "How much did you spend in the last 12 months?"
+fields:
+  - Food: users[0].expense_food
+    datatype: currency
+    default: 0
+    min: 0
+  - Clothing: users[0].expense_clothing
+    datatype: currency
+    default: 0
+    min: 0
+  - Laundry and Cleaning: users[0].expense_laundry
+    datatype: currency
+    default: 0
+    min: 0
+  - Telephone: users[0].expense_telephone
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: transport expenses
+question: "Transportation"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Transportation Expenses: users[0].expense_transportation
+    datatype: currency
+    default: 0
+    min: 0  
+  - Car insurance: users[0].expense_car_insurance
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: child related expenses
+question: "Expenses related to children"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Child Care: users[0].expense_childcare
+    datatype: currency
+    default: 0
+    min: 0
+  - Child Support: users[0].expense_child_support
+    datatype: currency
+    default: 0
+    min: 0
+  - Education Expenses for Children: users[0].expense_education
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: other monthly expenses
+question: |
+  Do you have other monthly expenses?
+fields:
+  - 'Describe your remaining expenses': users[0].expense_other
+    show if: users[0].expense_other_yes
+  - note: |
+      Diapers, for example.
+  - Other expense: users[0].expense_other_amount
+    show if: users[0].expense_other_yes
+    datatype: currency
+    default: 0
+    min: 0
 ---
 id: dependents
 question: |
@@ -663,111 +786,6 @@ fields:
     show if: users[0].disabilities_yes
   - note: If you wish to disclose them, describe how your disabilties affect your earning capacity or living expenses.
     show if: users[0].disabilities_yes
----
-id: monthly living expenses
-question: |
-  Monthly living expenses
-fields:
-  - 'Rent or Mortgage': users[0].expense_rent
-    datatype: integer
-    default: |
-      0
-  - 'Food': users[0].expense_food
-    datatype: integer
-    default: |
-      0
-  - 'Clothing': users[0].expense_clothing
-    datatype: integer
-    default: |
-      0
-  - 'Laundry': users[0].expense_laundry
-    datatype: integer
-    default: |
-      0
----
-id: monthly utilities
-question: |
-  Monthly Utilities
-fields: 
-  - 'Electricity': users[0].expense_electricity
-    datatype: integer
-    default: |
-      0
-  - 'Oil': users[0].expense_oil
-    datatype: integer
-    default: |
-      0
-  - 'Gas': users[0].expense_gas
-    datatype: integer
-    default: |
-      0
-  - 'Water': users[0].expense_water
-    datatype: integer
-    default: |
-      0
-  - 'Telephone': users[0].expense_telephone
-    datatype: integer
-    default: |
-      0
----
-id: monthly medical expenses
-question: |
-  Monthly Medical Expenses
-fields:
-  - 'Health insurance premium': users[0].expense_health_insurance
-    datatype: integer
-    default: |
-      0
-  - 'Uninsured medical expenses': users[0].expense_uninsured_medical
-    datatype: integer
-    default: |
-      0
----
-id: monthly child care
-question: |
-  Monthly Child Care Expenses
-fields:
-  - 'Education': users[0].expense_education
-    datatype: integer
-    default: |
-      0
-  - 'Childcare': users[0].expense_childcare
-    datatype: integer
-    default: |
-      0
-  - 'Child support': users[0].expense_child_support
-    datatype: integer
-    default: |
-      0
----
-id: monthly transportation expenses
-question: |
-  Monthly Transportation Expenses
-fields:
-  - 'Car insurance': users[0].expense_car_insurance
-    datatype: integer
-    default: |
-      0
-  - 'Transportation': users[0].expense_transportation
-    datatype: integer
-    default: |
-      0
----
-id: other monthly expenses
-question: |
-  Do you have other monthly expenses?
-fields:
-  - no label: users[0].expense_other_yes
-    datatype: yesnoradio
-  - note: |
-      Diapers, for example.
-  - 'Describe your remaining expenses': users[0].expense_other
-    show if: users[0].expense_other_yes
-  - 'Other expense': users[0].expense_other_amount
-    show if: users[0].expense_other_yes
-    datatype: integer
-    default: |
-      0
 ---
 id: expense calculation 
 code: | 
