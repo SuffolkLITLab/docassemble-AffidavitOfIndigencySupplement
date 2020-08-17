@@ -380,16 +380,11 @@ code: |
   users[0].dependents_number
   users[0].jobs.gather()
   jobs_description
-  users[0].income_jobs_gross_monthly
   users[0].nonemployment.gather()
+  jobs_description
   nonemployment_description
-  users[0].income_other_gross_monthly
+  users[0].income_gross_monthly
   users[0].income_after_tax
-  users[0].expense_rent
-  users[0].expense_electricity
-  users[0].expense_health_insurance
-  users[0].expense_childcare
-  users[0].expense_car_insurance
   if not users[0].expense_other_yes:
     users[0].expense_other = 'No Other Expenses'
     users[0].expense_other_amount = '0'
@@ -453,111 +448,120 @@ subquestion: |
 fields:
   - 'Name': users[0].name_print
 ---
-id: tax deductions
+id: income sources
 question: |
-  What are you monthly tax deductions?
+ How did you make money in the last 12 months?
 fields:
-  - 'Federal tax': users[0].tax_federal
-    datatype: integer
-    default: |
-      0
-  - 'State tax': users[0].tax_state
-    datatype: integer
-    default: |
-      0
-  - 'Social security tax': users[0].tax_social_security
-    datatype: integer
-    default: |
-      0
-  - 'Medicare tax': users[0].tax_medicare
-    datatype: integer
-    default: |
-      0
-  - 'Do you have other taxes?': users[0].tax_other_yes
-    datatype: yesnoradio
-  - 'Please specify other taxes': users[0].tax_other
-    show if: users[0].tax_other_yes
-  - 'Other tax total amount': users[0].tax_other_amount
-    show if: users[0].tax_other_yes
-    datatype: integer
-    default: |
-      0
+  - Employed by myself or someone else: users[0].jobs.there_are_any
+    datatype: yesnowide
+  - Nonemployment income: users[0].nonemployment.there_are_any
+    datatype: yesnowide
 ---
-id: tax total calcuation 
-code: |
-  users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
----
+id: job list collect
 question: |
-  Are you currently employed?
-yesno: users[0].jobs.there_are_any
----
-question: |
-  Tell us about your ${ ordinal(i) } job
+   Describe your job.
 fields:
   - Occupation: users[0].jobs[i].occupation
   - Employer Name: users[0].jobs[i].name.text
   - Employer Address: users[0].jobs[i].employer_address
     address autocomplete: True
+  - Income from the last 12 months: users[0].jobs[i].income_amount
+    datatype: currency
+    min: 0
+    default: 0
+  - Federal tax: users[0].jobs[i].tax_federal
+    datatype: currency
+    min: 0
+    default: 0
+  - State tax: users[0].jobs[i].tax_state
+    datatype: currency
+    min: 0
+    default: 0
+  - Social security tax: users[0].jobs[i].tax_social_security
+    datatype: currency
+    min: 0
+    default: 0
+  - Medicare tax: users[0].jobs[i].tax_medicare
+    datatype: currency
+    min: 0
+    default: 0
+  - Do you have other taxes?: users[0].jobs[i].tax_other_yes
+    datatype: yesnoradio
+  - Other: users[0].jobs[i].tax_other
+    show if: users[0].jobs[i].tax_other_yes
+  - Other tax amount: users[0].jobs[i].tax_other_amount
+    show if: users[0].jobs[i].tax_other_yes
+    datatype: currency
+    min: 0
+    default: 0
+list collect: True
 ---
+# uses dropdown with nonemployment sources of income list collect
+id: nonemployment income list collect
 question: |
-  Do you have any other jobs?
-yesno: users[0].jobs.there_is_another
----
-code: |
-  jobs_description = comma_and_list([job.occupation + ", " + job.name.text + ", " + job.employer_address + "\r" for job in users[0].jobs])
----
-question: |
-  Do you have income from sources other than employment?
-yesno: users[0].nonemployment.there_are_any
----
-question: |
-  Tell us about your ${ ordinal(i) } source of income
+  Nonemployment income
+subquestion: |
+  What did you receive in the last 12 months?
 fields:
   - Type of income: users[0].nonemployment[i].name.text
+    input type: dropdown
+    choices:
+      - royalties
+      - rental income
+      - interest
+      - dividends
+      - trusts
+      - annuities
+      - pensions
+      - retirement
+      - workers comp
+      - private disability insurance
+      - child support
+      - alimony
+      - contributions
+  - Amount: users[0].nonemployment[i].income_amount
+    datatype: currency
+    min: 0
+    default: 0
+list collect: True
 ---
-question: |
-  Do you have any other sources of income?
-yesno: users[0].nonemployment.there_is_another
----
+# sets the content for the pdf text areas
 code: |
+  jobs_description = comma_and_list([job.occupation + ", " + job.name.text + ", " + job.employer_address + "\r" for job in users[0].jobs])
   nonemployment_description = comma_and_list([other.name.text + "\r" for other in users[0].nonemployment])
 ---
-#Ideally, we can put in the name from their employer
-id: income from jobs with interval choice
-question: |
-  What is your income from (Employer Name) 
-fields:
-  - no label: users[0].income_jobs_interval
-    input type: radio
-    datatype: integer
-    code: period_list()
-  - Amount earned: users[0].income_jobs_amount
-    datatype: integer
-    default: 0
----
+# for loop for income and taxes, calculations gross annual for each
 code: |
-  users[0].income_jobs_gross_annual = users[0].income_jobs_amount * users[0].income_jobs_interval
-  users[0].income_jobs_gross_monthly = users[0].income_jobs_gross_annual / 12
+  users[0].income_jobs_gross_annual = 0
+  users[0].tax_gross_annual = 0
+  users[0].tax_gross_annual_federal = 0
+  users[0].tax_gross_annual_state = 0
+  users[0].tax_gross_annual_social_security = 0
+  users[0].tax_gross_annual_medicare = 0
+  users[0].tax_gross_annual_other = 0
+  for jobs in users[0].jobs:
+    users[0].income_jobs_gross_annual = users[0].income_jobs_gross_annual + jobs.income_amount
+    users[0].tax_gross_annual_federal = users[0].tax_gross_annual_federal + jobs.tax_federal
+    users[0].tax_gross_annual_state = users[0].tax_gross_annual_state + jobs.tax_state
+    users[0].tax_gross_annual_social_security = users[0].tax_gross_annual_social_security + jobs.tax_social_security
+    users[0].tax_gross_annual_medicare = users[0].tax_gross_annual_medicare + jobs.tax_medicare
+    users[0].tax_gross_annual_other = users[0].tax_gross_annual_other + jobs.tax_other_amount
 ---
+# for loop nonemployment income
 code: |
-  users[0].income_other_gross_annual = users[0].income_other_amount * users[0].income_other_interval
-  users[0].income_other_gross_monthly = users[0].income_other_gross_annual / 12
-  users[0].income_gross_monthly = users[0].income_jobs_gross_monthly + users[0].income_other_gross_monthly
+  users[0].income_other_gross_annual = 0
+  for other in users[0].nonemployment:
+    users[0].income_other_gross_annual = users[0].income_other_gross_annual + other.income_amount
+---
+# calculations for monthly gross income and monthly tax deductions: annual / 12
+code: |
   users[0].income_gross_annual = users[0].income_jobs_gross_annual + users[0].income_other_gross_annual
----
-id: income from other sources
-question: |
-  Income from other sources
-subquestion: |
-  For example: trust funds, social security benefits, disability benefits, etc.
-fields:
-  - interval: users[0].income_other_interval
-    input type: radio
-    datatype: integer
-    code: period_list()
-  - amount: users[0].income_other_amount
-    datatype: integer
-    default: 0
+  users[0].income_gross_monthly = users[0].income_gross_annual / 12
+  users[0].tax_federal = users[0].tax_gross_annual_federal / 12
+  users[0].tax_state = users[0].tax_gross_annual_state / 12
+  users[0].tax_social_security = users[0].tax_gross_annual_social_security /12
+  users[0].tax_medicare = users[0].tax_gross_annual_medicare / 12
+  users[0].tax_other_amount = users[0].tax_gross_annual_other / 12
 ---
 id: dependents
 question: |
@@ -651,13 +655,13 @@ fields:
 ---
 id: disabilities
 question: |
-  If you have disabilities, do they affect your earning capacity?
+  If you have disabilities, do they affect your earning capacity or living expenses?
 fields:
   - no label: users[0].disabilities_yes
     datatype: yesnoradio
   - no label: users[0].disabilities
     show if: users[0].disabilities_yes
-  - note: If yes, explain any mental or physical disabilties that affect your earning capacity or living expense.
+  - note: If you wish to disclose them, describe how your disabilties affect your earning capacity or living expenses.
     show if: users[0].disabilities_yes
 ---
 id: monthly living expenses
