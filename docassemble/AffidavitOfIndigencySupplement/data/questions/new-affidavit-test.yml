@@ -849,14 +849,14 @@ fields:
   - Employer Name: users[0].household[i].name.employer
   - Employer Address: users[0].household[i].employer_address
     address autocomplete: True
-  #- Monthly Income: users[0].household[i].household_income
+  - Monthly Income: users[0].household[i].household_income
 ---
 question: |
   Do you have another household member that is employed?
 yesno: users[0].household.there_is_another
 ---
 code: |
-  household_description = comma_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "\r" for hhmember in users[0].household])
+  household_description = comma_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "," + " " + "$" + str(hhmember.household_income) + "\r" for hhmember in users[0].household])
 ---
 id: miscellaneous facts
 question: |
