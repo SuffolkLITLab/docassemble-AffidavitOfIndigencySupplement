@@ -386,11 +386,48 @@ code: |
   users[0].income_gross_monthly
   users[0].tax_total
   users[0].income_after_tax
-  users[0].has_fixed_expenses
-  users[0].has_variable_expenses
-  users[0].has_health_expenses
-  users[0].has_transport_expenses
-  users[0].has_child_expenses
+  if users[0].has_fixed_expenses:
+    users[0].expense_rent
+    users[0].expense_electricity
+    users[0].expense_oil
+    users[0].expense_gas
+    users[0].expense_water
+  else:
+    users[0].expense_rent = 0
+    users[0].expense_electricity = 0
+    users[0].expense_oil = 0
+    users[0].expense_gas = 0
+    users[0].expense_water = 0
+  if users[0].has_variable_expenses:
+    users[0].expense_food
+    users[0].expense_clothing
+    users[0].expense_laundry
+    users[0].expense_telephone
+  else:
+    users[0].expense_food = 0
+    users[0].expense_clothing = 0
+    users[0].expense_laundry = 0
+    users[0].expense_telephone = 0    
+  if users[0].has_health_expenses:
+    users[0].expense_uninsured_medical
+    users[0].expense_health_insurance
+  else: 
+    users[0].expense_uninsured_medical = 0
+    users[0].expense_health_insurance = 0
+  if users[0].has_transport_expenses:
+    users[0].expense_car_insurance
+    users[0].expense_transportation
+  else:
+    users[0].expense_car_insurance = 0
+    users[0].expense_transportation = 0
+  if users[0].has_child_expenses:
+    users[0].expense_childcare
+    users[0].expense_child_support
+    users[0].expense_education
+  else:
+    users[0].expense_childcare = 0
+    users[0].expense_child_support = 0
+    users[0].expense_education = 0
   users[0].expense_total
   users[0].income_net
   if not users[0].expense_other_yes:
@@ -580,8 +617,6 @@ fields:
     datatype: yesnowide
   - Child Education, Child Support, and Child Care: users[0].has_child_expenses
     datatype: yesnowide
-  - Other Expenses: users[0].expense_other_yes
-    datatype: yesnowide
 ---
 id: fixed expenses amount
 question: "Fixed expenses"
@@ -674,12 +709,14 @@ fields:
 ---
 id: other monthly expenses
 question: |
-  Do you have other monthly expenses?
+  Do you have other expenses?
 fields:
-  - 'Describe your remaining expenses': users[0].expense_other
-    show if: users[0].expense_other_yes
   - note: |
       Diapers, for example.
+  - Do you have other expenses?: users[0].expense_other_yes
+    datatype: yesno
+  - 'Describe your remaining expenses': users[0].expense_other
+    show if: users[0].expense_other_yes
   - Other expense: users[0].expense_other_amount
     show if: users[0].expense_other_yes
     datatype: currency
