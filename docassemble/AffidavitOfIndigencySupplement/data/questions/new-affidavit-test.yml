@@ -440,7 +440,10 @@ code: |
   users[0].owns_car_yes
   if not users[0].unpaid_debts_yes: 
     users[0].debts = 'No Debts'
-  users[0].accounts_type
+  users[0].checking
+  users[0].savings
+  users[0].account.gather() 
+  account_description
   users[0].property_type
   users[0].miscellaneous_facts
   users[0].name_print
@@ -467,6 +470,7 @@ objects:
   - users[0].jobs: DAList.using(object_type=Person)
   - users[0].household: DAList.using(object_type=Person)
   - users[0].nonemployment: DAList.using(object_type=Thing)
+  - users[0].account: DAList.using(object_type=Thing)
 ---
 id: debts
 question: |
@@ -777,11 +781,39 @@ fields:
 ---
 id: bank account
 question: |
-  What is the balance of each of your bank accounts?
-subquestion: |
-  For example: checking account $100, savings account $200
+  What is the balance of your bank accounts?
 fields:
-  - 'Bank accounts': users[0].accounts_type
+  - 'Checking account': users[0].checking
+    datatype: currency
+    default: |
+      0.00
+  - 'Savings Account': users[0].savings
+    datatype: currency
+    default: |
+      0.00
+---
+question: |
+ Do you have another account that you wish to disclose?
+subquestion: |
+  For example: money market accounts, investment accounts etc. 
+yesno: users[0].account.there_are_any
+---
+question: |
+  Are there any other accounts that you wish to disclose? 
+yesno: users[0].account.there_is_another
+---
+question: |
+ Do you have another ${ ordinal(i) } account that you wish to disclose?
+fields:
+  - 'Account Type': users[0].account[i].name.text
+  - 'Account Balance': users[0].account[i].balance
+    datatype: currency
+    default: |
+      0.00
+---
+code: |
+  account_description = comma_and_list ([acct.name.text + ", " + str(acct.balance) + "\r" for acct in users[0].account])
+---
 ---
 #Talk to SME for guidance
 id: property
@@ -802,8 +834,14 @@ fields:
 id: education level
 question: |
   What is your highest level of education completed?
-fields:
-  - no label: users[0].grade_school_completed
+field: users[0].grade_school_completed
+dropdown: 
+ - did not complete high school
+ - high school or equivalent
+ - some college
+ - college
+ - some graduate school
+ - graduate school
 ---
 id: special training
 question: |
