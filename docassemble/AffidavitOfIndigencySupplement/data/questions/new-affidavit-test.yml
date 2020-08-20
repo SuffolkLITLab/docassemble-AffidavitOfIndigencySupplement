@@ -430,7 +430,10 @@ code: |
     users[0].expense_education = 0
   users[0].expense_total
   users[0].income_net
-  if not users[0].expense_other_yes:
+  if users[0].expense_other_yes:
+    users[0].expense_other
+    users[0].expense_other_amount
+  else:
     users[0].expense_other = 'No Other Expenses'
     users[0].expense_other_amount = '0'
   users[0].household.gather()
@@ -713,17 +716,17 @@ fields:
 ---
 id: other monthly expenses
 question: |
-  Do you have other expenses?
-fields:
-  - note: |
-      Diapers, for example.
-  - Do you have other expenses?: users[0].expense_other_yes
+  Do you have other monthly expenses that were not mentioned?
+subquestion: |
+  Diapers, for example.
+fields: 
+  - Other monthly expenses: users[0].expense_other_yes
     datatype: yesno
   - 'Describe your remaining expenses': users[0].expense_other
     show if: users[0].expense_other_yes
   - Other expense: users[0].expense_other_amount
     show if: users[0].expense_other_yes
-    datatype: currency
+    datatype: integer
     default: 0
     min: 0
 ---
@@ -737,8 +740,6 @@ fields:
 id: home
 question: |
   Do you own a home?
-subquestion: |
-  Placeholder text
 fields:
   - no label: users[0].owns_home_yes
     datatype: yesnoradio
@@ -756,8 +757,6 @@ fields:
 id: car
 question: |
   Do you own a car?
-subquestion: |
-  Placeholder text
 fields:
   - no label: users[0].owns_car_yes
     datatype: yesnoradio
@@ -991,8 +990,7 @@ attachment:
       - "user_car_make": ${ users[0].car_make }
       - "user_car_debt": ${ users[0].car_debt }
       - "user_car_value": ${ users[0].car_value }
-      - "user_accounts_balance": ${ users[0].accounts_balance }
-      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_accounts_type": ${ account_description }
       - "user_property_type": ${ users[0].property_type }
       - "user_property_value": ${ users[0].property_value }
       - "user_debts": ${ users[0].debts }
@@ -1087,8 +1085,7 @@ attachment:
       - "user_car_make": ${ users[0].car_make }
       - "user_car_debt": ${ users[0].car_debt }
       - "user_car_value": ${ users[0].car_value }
-      - "user_accounts_balance": ${ users[0].accounts_balance }
-      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_accounts_type": ${ account_description }
       - "user_property_type": ${ users[0].property_type }
       - "user_property_value": ${ users[0].property_value }
       - "user_debts": ${ users[0].debts }
