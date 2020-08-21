@@ -550,7 +550,7 @@ subquestion: |
   What did you receive in the last 12 months?
 fields:
   - Type of income: users[0].nonemployment[i].name.text
-    input type: dropdown
+    input type: combobox
     choices:
       - royalties
       - rental income
