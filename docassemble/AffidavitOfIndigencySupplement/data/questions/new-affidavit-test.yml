@@ -879,7 +879,7 @@ question: |
 yesno: users[0].household.there_are_any
 ---
 question: |
-  Tell us about your ${ ordinal(i) } household member's employment
+  Describe your ${ ordinal(i) } household member's employment
 fields:
   - Name of Household Member: users[0].household[i].name.text
   - Occupation: users[0].household[i].occupation
