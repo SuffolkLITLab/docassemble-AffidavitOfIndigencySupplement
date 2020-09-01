@@ -545,7 +545,7 @@ list collect: True
 # uses dropdown with nonemployment sources of income list collect
 id: nonemployment income list collect
 question: |
-  Nonemployment income
+  Sources of income, if not from employment.
 subquestion: |
   What did you receive in the last 12 months?
 fields:
@@ -791,12 +791,14 @@ fields:
     default: |
       0.00
 ---
+id: loop start bank accounts
 question: |
  Do you have another account that you wish to disclose?
 subquestion: |
   For example: money market accounts, investment accounts etc. 
 yesno: users[0].account.there_are_any
 ---
+id: another account
 question: |
   Are there any other accounts that you wish to disclose? 
 yesno: users[0].account.there_is_another
@@ -813,7 +815,6 @@ fields:
 code: |
   account_description = comma_and_list ([acct.name.text + ", " + str(acct.balance) + "\r" for acct in users[0].account])
 ---
----
 #Talk to SME for guidance
 id: property
 question: |
@@ -824,6 +825,7 @@ subquestion: |
 fields:
   - 'List all property, including Real Estate': users[0].property_type
 ---
+id: case info
 question: |
   What is your case name and number?
 fields:
@@ -878,6 +880,7 @@ question: |
   Do you live with a household member that is employed?
 yesno: users[0].household.there_are_any
 ---
+id: household employment
 question: |
   Describe your ${ ordinal(i) } household member's employment
 fields:
@@ -1000,6 +1003,7 @@ attachment:
 include:
   - docassemble.MAVirtualCourt:basic-questions.yml
 ---
+id: intro
 comment: |
   This question is used to introduce your interview. Please customize
 continue button field: Affidavit_to_Indigency_Supplement0027_intro
@@ -1008,6 +1012,7 @@ question: |
 subquestion: |
   A MA statute provides that if you cannot pay for court fees or costs, you may be eligible to have the state cover them. If you checked C on the Affidavit of Indigency, you must fill out this form.
 ---
+id: preview
 continue button field: Affidavit_to_Indigency_Supplement0027_preview_question
 question: |
   Placeholder preview screen
