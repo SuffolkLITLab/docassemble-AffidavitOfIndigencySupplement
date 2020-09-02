@@ -252,8 +252,8 @@ code: |
       'field_type': 'text',
       'field_data_type': 'text',
       },
-      {'variable': 'user_expense_ransportation',
-       'transformed_variable': 'users[0].expense_ransportation',
+      {'variable': 'user_expense_transportation',
+       'transformed_variable': 'users[0].expense_transportation',
       'field_type': 'text',
       'field_data_type': 'text',
       },
@@ -361,13 +361,132 @@ code: |
       ],
   })
 ---
-question: |
-  List debts
-subquestion: |
-  Placeholder text
-fields:
-  - 'Debts': users[0].debts
+id: interview_order_Affidavit_to_Indigency_Supplement0027
+code: |
+  # This is a placeholder to control logic flow in this interview
+  # It was generated from interview_generator.py as an 'interview order' type question.
+  basic_questions_intro_screen 
+  Affidavit_to_Indigency_Supplement0027_intro
+  # Set the preferred/allowed courts for this interview
+  preferred_court = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["preferred court"]
+  allowed_courts = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["allowed courts"]
+  user_role = "plaintiff"
+  case_number
+
+  users[0].grade_school_completed
+  users[0].training
+  if not users[0].disabilities_yes:
+    users[0].disabilities = 'No Disabilities'
+  users[0].dependents_number
+  users[0].jobs.gather()
+  jobs_description
+  users[0].nonemployment.gather()
+  jobs_description
+  nonemployment_description
+  users[0].income_gross_monthly
+  users[0].tax_total
+  users[0].income_after_tax
+  if users[0].has_fixed_expenses:
+    users[0].expense_rent
+    users[0].expense_electricity
+    users[0].expense_oil
+    users[0].expense_gas
+    users[0].expense_water
+  else:
+    users[0].expense_rent = 0
+    users[0].expense_electricity = 0
+    users[0].expense_oil = 0
+    users[0].expense_gas = 0
+    users[0].expense_water = 0
+  if users[0].has_variable_expenses:
+    users[0].expense_food
+    users[0].expense_clothing
+    users[0].expense_laundry
+    users[0].expense_telephone
+  else:
+    users[0].expense_food = 0
+    users[0].expense_clothing = 0
+    users[0].expense_laundry = 0
+    users[0].expense_telephone = 0    
+  if users[0].has_health_expenses:
+    users[0].expense_uninsured_medical
+    users[0].expense_health_insurance
+  else: 
+    users[0].expense_uninsured_medical = 0
+    users[0].expense_health_insurance = 0
+  if users[0].has_transport_expenses:
+    users[0].expense_car_insurance
+    users[0].expense_transportation
+  else:
+    users[0].expense_car_insurance = 0
+    users[0].expense_transportation = 0
+  if users[0].has_child_expenses:
+    users[0].expense_childcare
+    users[0].expense_child_support
+    users[0].expense_education
+  else:
+    users[0].expense_childcare = 0
+    users[0].expense_child_support = 0
+    users[0].expense_education = 0
+  users[0].expense_total
+  users[0].income_net
+  if users[0].expense_other_yes:
+    users[0].expense_other
+    users[0].expense_other_amount
+  else:
+    users[0].expense_other = 'No Other Expenses'
+    users[0].expense_other_amount = '0'
+  users[0].household.gather()
+  household_description
+  users[0].tax_federal
+  users[0].owns_home_yes
+  users[0].owns_car_yes
+  if not users[0].unpaid_debts_yes: 
+    users[0].debts = 'No Debts'
+  users[0].checking
+  users[0].savings
+  users[0].account.gather() 
+  account_description
+  users[0].property_type
+  users[0].miscellaneous_facts
+  users[0].name_print
+
+  str(courts[0])
+  str(users[0])
+  users[0].address.on_one_line()
+  users[0].birthdate.format()
+  users[0].address.address
+  users[0].address.city
+  users[0].address.state
+  users[0].address.zip
+  signature_date
+  # By default, we'll mark any un-filled fields as DAEmpty(). This helps avoid errors if you intentionally hide a logic branch or mark a question not required
+  # Comment out the line below if you don't want this behavior. 
+  mark_unfilled_fields_empty(interview_metadata["Affidavit_to_Indigency_Supplement0027"])
+  Affidavit_to_Indigency_Supplement0027_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  users[0].signature
+  Affidavit_to_Indigency_Supplement0027 = True
 ---
+id: objects
+objects: 
+  - users[0].jobs: DAList.using(object_type=Person)
+  - users[0].household: DAList.using(object_type=Person)
+  - users[0].nonemployment: DAList.using(object_type=Thing)
+  - users[0].account: DAList.using(object_type=Thing)
+---
+id: debts
+question: |
+  Do you have any unpaid debts?
+subquestion: |
+  If yes, enter debt type and amount
+fields:
+  - no label: users[0].unpaid_debts_yes
+    datatype: yesnoradio
+  - 'Specify all debts': users[0].debts
+    show if: users[0].unpaid_debts_yes
+---
+id: signature
 question: |
   Signature
 subquestion: |
@@ -375,52 +494,277 @@ subquestion: |
 fields:
   - 'Name': users[0].name_print
 ---
+id: income sources
 question: |
-  Monthly Tax Deductions
-subquestion: |
-  Placeholder text
+ How did you make money in the last 12 months?
 fields:
-  - 'Federal tax': users[0].tax_federal
-  - 'State tax': users[0].tax_state
-  - 'Social security tax': users[0].tax_social_security
-  - 'Medicare tax': users[0].tax_medicare
-  - 'Other tax': users[0].tax_other
-  - 'Other tax amount': users[0].tax_other_amount
-  - 'Total tax': users[0].tax_total
+  - Employed by myself or someone else: users[0].jobs.there_are_any
+    datatype: yesnowide
+  - Nonemployment income: users[0].nonemployment.there_are_any
+    datatype: yesnowide
 ---
+id: job list collect
 question: |
-  Sources of Income
-subquestion: |
-  Placeholder text
+   Describe your job.
 fields:
-  - 'Number of dependents': users[0].dependents_number
-  - 'Employer name': users[0].work_name
-  - 'Employer address': users[0].work_address_one_line
-  - 'Non-employment Income': users[0].income_nonemployment
-  - 'Gross annual income': users[0].income_gross_annual
-  - 'Gross monthly income': users[0].income_gross_monthly
+  - Occupation: users[0].jobs[i].occupation
+  - Employer Name: users[0].jobs[i].name.text
+  - Employer Address: users[0].jobs[i].employer_address
+    address autocomplete: True
+  - Income from the last 12 months: users[0].jobs[i].income_amount
+    datatype: currency
+    min: 0
+    default: 0
+  - Federal tax: users[0].jobs[i].tax_federal
+    datatype: currency
+    min: 0
+    default: 0
+  - State tax: users[0].jobs[i].tax_state
+    datatype: currency
+    min: 0
+    default: 0
+  - Social security tax: users[0].jobs[i].tax_social_security
+    datatype: currency
+    min: 0
+    default: 0
+  - Medicare tax: users[0].jobs[i].tax_medicare
+    datatype: currency
+    min: 0
+    default: 0
+  - Do you have other taxes?: users[0].jobs[i].tax_other_yes
+    datatype: yesnoradio
+  - Other: users[0].jobs[i].tax_other
+    show if: users[0].jobs[i].tax_other_yes
+  - Other tax amount: users[0].jobs[i].tax_other_amount
+    show if: users[0].jobs[i].tax_other_yes
+    datatype: currency
+    min: 0
+    default: 0
+list collect: True
 ---
+# uses dropdown with nonemployment sources of income list collect
+id: nonemployment income list collect
+question: |
+  Sources of income, if not from employment.
+subquestion: |
+  What did you receive in the last 12 months?
+fields:
+  - Type of income: users[0].nonemployment[i].name.text
+    input type: combobox
+    choices:
+      - royalties
+      - rental income
+      - interest
+      - dividends
+      - trusts
+      - annuities
+      - pensions
+      - retirement
+      - workers comp
+      - private disability insurance
+      - child support
+      - alimony
+      - contributions
+  - Amount: users[0].nonemployment[i].income_amount
+    datatype: currency
+    min: 0
+    default: 0
+list collect: True
+---
+# sets the content for the pdf text areas
+code: |
+  jobs_description = comma_and_list([job.occupation + ", " + job.name.text + ", " + job.employer_address + "\r" for job in users[0].jobs])
+  nonemployment_description = comma_and_list([other.name.text + "\r" for other in users[0].nonemployment])
+---
+# for loop for income and taxes, calculations gross annual for each
+code: |
+  users[0].income_jobs_gross_annual = 0
+  users[0].tax_gross_annual = 0
+  users[0].tax_gross_annual_federal = 0
+  users[0].tax_gross_annual_state = 0
+  users[0].tax_gross_annual_social_security = 0
+  users[0].tax_gross_annual_medicare = 0
+  users[0].tax_gross_annual_other = 0
+  for jobs in users[0].jobs:
+    users[0].income_jobs_gross_annual = users[0].income_jobs_gross_annual + jobs.income_amount
+    users[0].tax_gross_annual_federal = users[0].tax_gross_annual_federal + jobs.tax_federal
+    users[0].tax_gross_annual_state = users[0].tax_gross_annual_state + jobs.tax_state
+    users[0].tax_gross_annual_social_security = users[0].tax_gross_annual_social_security + jobs.tax_social_security
+    users[0].tax_gross_annual_medicare = users[0].tax_gross_annual_medicare + jobs.tax_medicare
+    users[0].tax_gross_annual_other = users[0].tax_gross_annual_other + jobs.tax_other_amount
+---
+# for loop nonemployment income
+code: |
+  users[0].income_other_gross_annual = 0
+  for other in users[0].nonemployment:
+    users[0].income_other_gross_annual = users[0].income_other_gross_annual + other.income_amount
+---
+# calculations for monthly gross income and monthly tax deductions: annual / 12
+code: |
+  users[0].income_gross_annual = users[0].income_jobs_gross_annual + users[0].income_other_gross_annual
+  users[0].income_gross_monthly = users[0].income_gross_annual / 12
+  users[0].tax_federal = users[0].tax_gross_annual_federal / 12
+  users[0].tax_state = users[0].tax_gross_annual_state / 12
+  users[0].tax_social_security = users[0].tax_gross_annual_social_security /12
+  users[0].tax_medicare = users[0].tax_gross_annual_medicare / 12
+  users[0].tax_other_amount = users[0].tax_gross_annual_other / 12
+  users[0].tax_total = users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount
+---
+id: expenses control
+question: |
+  What expenses did you pay in the last 12 months?
+fields:
+  - Rent, Mortgage, and Utilities: users[0].has_fixed_expenses
+    datatype: yesnowide
+  - Health insurance and Uninsured Medical Expenses,: users[0].has_health_expenses
+    datatype: yesnowide
+  - Food, Clothing, Laundry, Cleaning, and Telephone: users[0].has_variable_expenses
+    datatype: yesnowide
+  - Transportation and Car Insurance: users[0].has_transport_expenses
+    datatype: yesnowide
+  - Child Education, Child Support, and Child Care: users[0].has_child_expenses
+    datatype: yesnowide
+---
+id: fixed expenses amount
+question: "Fixed expenses"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Rent or Mortgage: users[0].expense_rent
+    datatype: currency    
+    default: 0
+    min: 0
+  - Electricity: users[0].expense_electricity
+    datatype: currency
+    default: 0
+    min: 0
+  - Oil: users[0].expense_oil
+    datatype: currency
+    default: 0
+    min: 0
+  - Gas: users[0].expense_gas
+    datatype: currency
+    default: 0
+    min: 0
+  - Water: users[0].expense_water
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: health expenses amount
+question: "Health"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Uninsured medical expenses: users[0].expense_uninsured_medical
+    datatype: currency
+    default: 0
+    min: 0
+  - Health insurance: users[0].expense_health_insurance
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: variable expenses amount
+question: "Variable expenses"
+subquestion: "How much did you spend in the last 12 months?"
+fields:
+  - Food: users[0].expense_food
+    datatype: currency
+    default: 0
+    min: 0
+  - Clothing: users[0].expense_clothing
+    datatype: currency
+    default: 0
+    min: 0
+  - Laundry and Cleaning: users[0].expense_laundry
+    datatype: currency
+    default: 0
+    min: 0
+  - Telephone: users[0].expense_telephone
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: transport expenses
+question: "Transportation"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Transportation Expenses: users[0].expense_transportation
+    datatype: currency
+    default: 0
+    min: 0  
+  - Car insurance: users[0].expense_car_insurance
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: child related expenses
+question: "Expenses related to children"
+subquestion: "How much did you pay in the last 12 months?"
+fields:
+  - Child Care: users[0].expense_childcare
+    datatype: currency
+    default: 0
+    min: 0
+  - Child Support: users[0].expense_child_support
+    datatype: currency
+    default: 0
+    min: 0
+  - Education Expenses for Children: users[0].expense_education
+    datatype: currency
+    default: 0
+    min: 0
+---
+id: other monthly expenses
+question: |
+  Do you have other monthly expenses that were not mentioned?
+subquestion: |
+  Diapers, for example.
+fields: 
+  - Other monthly expenses: users[0].expense_other_yes
+    datatype: yesno
+  - 'Describe your remaining expenses': users[0].expense_other
+    show if: users[0].expense_other_yes
+  - Other expense: users[0].expense_other_amount
+    show if: users[0].expense_other_yes
+    datatype: integer
+    default: 0
+    min: 0
+---
+id: dependents
+question: |
+  How many dependents do you claim?
+fields: 
+  - no label: users[0].dependents_number
+    datatype: integer
+---
+id: home
 question: |
   Do you own a home?
-subquestion: |
-  Placeholder text
 fields:
   - no label: users[0].owns_home_yes
     datatype: yesnoradio
   - 'Home value': users[0].home_value
     show if: users[0].owns_home_yes
+    datatype: integer
+    default: |
+      0
   - 'Home debt': users[0].home_debt
     show if: users[0].owns_home_yes
+    datatype: integer
+    default: |
+      0
 ---
+id: car
 question: |
   Do you own a car?
-subquestion: |
-  Placeholder text
 fields:
   - no label: users[0].owns_car_yes
     datatype: yesnoradio
   - 'Car value': users[0].car_value
     show if: users[0].owns_car_yes
+    datatype: integer
+    default: |
+      0
   - 'Car year': users[0].car_year
     show if: users[0].owns_car_yes
   - 'Car make': users[0].car_make
@@ -430,81 +774,137 @@ fields:
     datatype: yesnoradio
   - 'Car debt amount': users[0].car_debt
     show if: users[0].car_loan
+    datatype: integer
+    default: |
+      0
+---
+id: bank account
+question: |
+  What is the balance of your bank accounts?
+fields:
+  - 'Checking account': users[0].checking
+    datatype: currency
+    default: |
+      0.00
+  - 'Savings Account': users[0].savings
+    datatype: currency
+    default: |
+      0.00
+---
+id: loop start bank accounts
+question: |
+ Do you have another account that you wish to disclose?
+subquestion: |
+  For example: money market accounts, investment accounts etc. 
+yesno: users[0].account.there_are_any
+---
+id: another account
+question: |
+  Are there any other accounts that you wish to disclose? 
+yesno: users[0].account.there_is_another
 ---
 question: |
-  List Assets
-subquestion: |
-  Placeholder text
+ Do you have another ${ ordinal(i) } account that you wish to disclose?
 fields:
-  - 'Bank account type': users[0].accounts_type
-  - 'Bank accounts balance': users[0].accounts_balance
+  - 'Account Type': users[0].account[i].name.text
+  - 'Account Balance': users[0].account[i].balance
+    datatype: currency
+    default: |
+      0.00
+---
+code: |
+  account_description = comma_and_list ([acct.name.text + ", " + str(acct.balance) + "\r" for acct in users[0].account])
+---
+#Talk to SME for guidance
+id: property
+question: |
+  What is the value of your property?
+subquestion: |
+  List all real estate and physical property and its value
+  For example: house $10,000, car $2,000
+fields:
   - 'List all property, including Real Estate': users[0].property_type
-  - 'Property value': users[0].property_value
 ---
+id: case info
 question: |
-  What is the information of your case?
-subquestion: |
-  Placeholder text
+  What is your case name and number?
 fields:
-  - 'Case number': case_number
   - 'Case name': case_name
+  - 'Case number': case_number
+---
+id: education level
+question: |
+  What is your highest level of education completed?
+field: users[0].grade_school_completed
+dropdown: 
+ - did not complete high school
+ - high school or equivalent
+ - some college
+ - college
+ - some graduate school
+ - graduate school
+---
+id: special training
+question: |
+  List any special training you have
+subquestion: |
+  For example: trade or professional certifications, licenses, etc.
+fields:
+  - no label: users[0].training
+---
+id: disabilities
+question: |
+  If you have disabilities, do they affect your earning capacity or living expenses?
+fields:
+  - no label: users[0].disabilities_yes
+    datatype: yesnoradio
+  - no label: users[0].disabilities
+    show if: users[0].disabilities_yes
+  - note: If you wish to disclose them, describe how your disabilties affect your earning capacity or living expenses.
+    show if: users[0].disabilities_yes
+---
+id: expense calculation 
+code: | 
+  users[0].expense_total = users[0].expense_rent + users[0].expense_uninsured_medical + users[0].expense_food + users[0].expense_childcare + users[0].expense_electricity + users[0].expense_education + users[0].expense_child_support + users[0].expense_gas + users[0].expense_clothing + users[0].expense_oil + users[0].expense_laundry + users[0].expense_water + users[0].expense_car_insurance + users[0].expense_telephone + users[0].expense_health_insurance + users[0].expense_transportation + users[0].expense_other_amount
+---
+id: net income calculation 
+code: |
+  users[0].income_net = users[0].income_after_tax -  users[0].expense_total
+---
+id: income after tax calculation 
+code: | 
+   users[0].income_after_tax = users[0].income_gross_monthly - (users[0].tax_federal + users[0].tax_state + users[0].tax_social_security + users[0].tax_medicare + users[0].tax_other_amount)
+---
+id: household members
+question: |
+  Do you live with a household member that is employed?
+yesno: users[0].household.there_are_any
+---
+id: household employment
+question: |
+  Describe your ${ ordinal(i) } household member's employment
+fields:
+  - Name of Household Member: users[0].household[i].name.text
+  - Occupation: users[0].household[i].occupation
+  - Employer Name: users[0].household[i].name.employer
+  - Employer Address: users[0].household[i].employer_address
+    address autocomplete: True
+  - Monthly Income: users[0].household[i].household_income
 ---
 question: |
-  Education and Training
-subquestion: |
-  Placeholder text
-fields:
-  - 'Highest grade in school completed': users[0].grade_school_completed
-  - 'Special training': users[0].training
-  - 'List any mental or physical disabilities which affect your earning capacity or living expenses': users[0].disabilities
+  Do you have another household member that is employed?
+yesno: users[0].household.there_is_another
 ---
-question: |
-  Net Income
-subquestion: |
-  List monthly expenses
-fields:
-  - 'Rent expense': users[0].expense_rent
-  - 'Uninsured medical expense': users[0].expense_uninsured_medical
-  - 'Food expense': users[0].expense_food
-  - 'Childcare expense': users[0].expense_childcare
-  - 'Electricity expense': users[0].expense_electricity
-  - 'Education expense': users[0].expense_education
-  - 'Child support expense': users[0].expense_child_support
-  - 'Gas expense': users[0].expense_gas
-  - 'Clothing expense': users[0].expense_clothing
-  - 'Oil expense': users[0].expense_oil
-  - 'Laundry expense': users[0].expense_laundry
-  - 'Water expense': users[0].expense_water
-  - 'Car insurance expense': users[0].expense_car_insurance
-  - 'Telephone expense': users[0].expense_telephone
-  - 'user health insurance expense': users[0].expense_health_insurance
-  - 'Transportation expense': users[0].expense_ransportation
-  - 'Other expense': users[0].expense_other
-  - 'Other expense amount': users[0].expense_other_amount
-  # Hopefully will be auto-populated - 'Total expenses': users[0].expense_total
-  # Hopefully will be auto-populated - 'Net income': users[0].income_net
+code: |
+  household_description = comma_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "," + " " + "$" + str(hhmember.household_income) + "\r" for hhmember in users[0].household])
 ---
-question: |
-  Total Income After Taxes
-subquestion: |
-  Placeholder text
-fields:
-  - 'user income after tax': users[0].income_after_tax
----
-question: |
-  Household Member's Employment Information
-subquestion: |
-  Placeholder text
-fields:
-  - 'Household member work address':     users[0].household_member_work_address_one_line
-  - 'Househould member work name': users[0].househould_member_work_name
----
+id: miscellaneous facts
 question: |
   What other facts may be relevant to your ability to pay fees and costs?
-subquestion: |
-  Placeholder text
 fields:
-  - 'user miscellaneous facts': users[0].miscellaneous_facts
+  - 'Miscellaneous': users[0].miscellaneous_facts
+    input type: area
+    rows: 4
 ---
 progress: 100
 mandatory: True
@@ -549,9 +949,8 @@ attachment:
       - "user_training": ${ users[0].training }
       - "user_disabilities": ${ users[0].disabilities }
       - "user_dependents_number": ${ users[0].dependents_number }
-      - "user_work_address_one_line": ${ users[0].work_address_one_line }
-      - "user_work_name": ${ users[0].work_name }
-      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_work_name": ${ jobs_description }
+      - "user_income_nonemployment": ${ nonemployment_description }
       - "user_income_gross_annual": ${ users[0].income_gross_annual }
       - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
       - "user_tax_federal": ${ users[0].tax_federal }
@@ -562,8 +961,7 @@ attachment:
       - "user_tax_other_amount": ${ users[0].tax_other_amount }
       - "user_tax_total": ${ users[0].tax_total }
       - "user_income_after_tax": ${ users[0].income_after_tax }
-      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
-      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_househould_member_work_name": ${ household_description }
       - "user_income_after_tax__1": ${ users[0].income_after_tax }
       - "user_expense_rent": ${ users[0].expense_rent }
       - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
@@ -580,7 +978,7 @@ attachment:
       - "user_expense_car_insurance": ${ users[0].expense_car_insurance }
       - "user_expense_telephone": ${ users[0].expense_telephone }
       - "user_expense_health_insurance": ${ users[0].expense_health_insurance }
-      - "user_expense_ransportation": ${ users[0].expense_ransportation }
+      - "user_expense_transportation": ${ users[0].expense_transportation }
       - "user_expense_other": ${ users[0].expense_other }
       - "user_expense_other_amount": ${ users[0].expense_other_amount }
       - "user_expense_total": ${ users[0].expense_total }
@@ -589,14 +987,13 @@ attachment:
       - "user_owns_home_no": ${ not users[0].owns_home_yes }
       - "user_home_value": ${ users[0].home_value }
       - "user_home_debt": ${ users[0].home_debt }
-      - "user_owns_car_no": ${ not users[0].owns_car_yes }
       - "user_owns_car_yes": ${ users[0].owns_car_yes }
+      - "user_owns_car_no": ${ not users[0].owns_car_yes }
       - "user_car_year": ${ users[0].car_year }
       - "user_car_make": ${ users[0].car_make }
       - "user_car_debt": ${ users[0].car_debt }
       - "user_car_value": ${ users[0].car_value }
-      - "user_accounts_balance": ${ users[0].accounts_balance }
-      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_accounts_type": ${ account_description }
       - "user_property_type": ${ users[0].property_type }
       - "user_property_value": ${ users[0].property_value }
       - "user_debts": ${ users[0].debts }
@@ -606,58 +1003,16 @@ attachment:
 include:
   - docassemble.MAVirtualCourt:basic-questions.yml
 ---
+id: intro
 comment: |
   This question is used to introduce your interview. Please customize
 continue button field: Affidavit_to_Indigency_Supplement0027_intro
 question: |
-  Supplement To Affidavit Of Indigency And Request For Waiver, Substitution Or State Payment Of Fees
+  Affidavit Of Indigency Supplement
 subquestion: |
   A MA statute provides that if you cannot pay for court fees or costs, you may be eligible to have the state cover them. If you checked C on the Affidavit of Indigency, you must fill out this form.
 ---
-id: interview_order_Affidavit_to_Indigency_Supplement0027
-code: |
-  # This is a placeholder to control logic flow in this interview
-  # It was generated from interview_generator.py as an 'interview order' type question.
-  basic_questions_intro_screen 
-  Affidavit_to_Indigency_Supplement0027_intro
-  # Set the preferred/allowed courts for this interview
-  preferred_court = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["preferred court"]
-  allowed_courts = interview_metadata["Affidavit_to_Indigency_Supplement0027"]["allowed courts"]
-  user_role = "plaintiff"
-  case_number
-
-  users[0].grade_school_completed
-  users[0].dependents_number
-  users[0].expense_rent
-  users[0].household_member_work_address_one_line
-  users[0].househould_member_work_name
-  users[0].tax_federal
-  users[0].income_after_tax
-  users[0].owns_home_yes
-  users[0].owns_car_yes
-  users[0].car_loan
-  users[0].car_debt
-  users[0].debts
-  users[0].miscellaneous_facts
-  users[0].name_print
-
-  str(courts[0])
-  str(users[0])
-  users[0].address.on_one_line()
-  users[0].birthdate.format()
-  users[0].address.address
-  users[0].address.city
-  users[0].address.state
-  users[0].address.zip
-  signature_date
-  # By default, we'll mark any un-filled fields as DAEmpty(). This helps avoid errors if you intentionally hide a logic branch or mark a question not required
-  # Comment out the line below if you don't want this behavior. 
-  mark_unfilled_fields_empty(interview_metadata["Affidavit_to_Indigency_Supplement0027"])
-  Affidavit_to_Indigency_Supplement0027_preview_question # Pre-canned preview screen
-  basic_questions_signature_flow
-  users[0].signature
-  Affidavit_to_Indigency_Supplement0027 = True
----
+id: preview
 continue button field: Affidavit_to_Indigency_Supplement0027_preview_question
 question: |
   Placeholder preview screen
@@ -691,9 +1046,8 @@ attachment:
       - "user_training": ${ users[0].training }
       - "user_disabilities": ${ users[0].disabilities }
       - "user_dependents_number": ${ users[0].dependents_number }
-      - "user_work_address_one_line": ${ users[0].work_address_one_line }
-      - "user_work_name": ${ users[0].work_name }
-      - "user_income_nonemployment": ${ users[0].income_nonemployment }
+      - "user_work_name": ${ jobs_description }
+      - "user_income_nonemployment": ${ nonemployment_description }
       - "user_income_gross_annual": ${ users[0].income_gross_annual }
       - "user_income_gross_monthly": ${ users[0].income_gross_monthly }
       - "user_tax_federal": ${ users[0].tax_federal }
@@ -704,8 +1058,7 @@ attachment:
       - "user_tax_other_amount": ${ users[0].tax_other_amount }
       - "user_tax_total": ${ users[0].tax_total }
       - "user_income_after_tax": ${ users[0].income_after_tax }
-      - "household_member_work_address_one_line": ${ users[0].household_member_work_address_one_line }
-      - "househould_member_work_name": ${ users[0].househould_member_work_name }
+      - "user_househould_member_work_name": ${ household_description }
       - "user_income_after_tax__1": ${ users[0].income_after_tax }
       - "user_expense_rent": ${ users[0].expense_rent }
       - "user_expense_uninsured_medical": ${ users[0].expense_uninsured_medical }
@@ -722,7 +1075,7 @@ attachment:
       - "user_expense_car_insurance": ${ users[0].expense_car_insurance }
       - "user_expense_telephone": ${ users[0].expense_telephone }
       - "user_expense_health_insurance": ${ users[0].expense_health_insurance }
-      - "user_expense_ransportation": ${ users[0].expense_ransportation }
+      - "user_expense_transportation": ${ users[0].expense_transportation }
       - "user_expense_other": ${ users[0].expense_other }
       - "user_expense_other_amount": ${ users[0].expense_other_amount }
       - "user_expense_total": ${ users[0].expense_total }
@@ -731,14 +1084,13 @@ attachment:
       - "user_owns_home_no": ${ not users[0].owns_home_yes }
       - "user_home_value": ${ users[0].home_value }
       - "user_home_debt": ${ users[0].home_debt }
-      - "user_owns_car_no": ${ not users[0].owns_car_yes }
       - "user_owns_car_yes": ${ users[0].owns_car_yes }
+      - "user_owns_car_no": ${ not users[0].owns_car_yes }
       - "user_car_year": ${ users[0].car_year }
       - "user_car_make": ${ users[0].car_make }
       - "user_car_debt": ${ users[0].car_debt }
       - "user_car_value": ${ users[0].car_value }
-      - "user_accounts_balance": ${ users[0].accounts_balance }
-      - "user_accounts_type": ${ users[0].accounts_type }
+      - "user_accounts_type": ${ account_description }
       - "user_property_type": ${ users[0].property_type }
       - "user_property_value": ${ users[0].property_value }
       - "user_debts": ${ users[0].debts }
