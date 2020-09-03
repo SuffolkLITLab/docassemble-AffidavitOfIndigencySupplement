@@ -612,13 +612,13 @@ code: |
 ---
 id: expenses control
 question: |
-  What expenses did you pay in the last 12 months?
+  What are your monthly expenses?
 fields:
-  - Rent, Mortgage, and Utilities: users[0].has_fixed_expenses
+  - Rent, Mortgage, Utilities, and Telephone: users[0].has_fixed_expenses
     datatype: yesnowide
-  - Health insurance and Uninsured Medical Expenses,: users[0].has_health_expenses
+  - Health insurance and Uninsured Medical Expenses: users[0].has_health_expenses
     datatype: yesnowide
-  - Food, Clothing, Laundry, Cleaning, and Telephone: users[0].has_variable_expenses
+  - Food, Clothing, Laundry, and Cleaning: users[0].has_variable_expenses
     datatype: yesnowide
   - Transportation and Car Insurance: users[0].has_transport_expenses
     datatype: yesnowide
@@ -626,8 +626,8 @@ fields:
     datatype: yesnowide
 ---
 id: fixed expenses amount
-question: "Fixed expenses"
-subquestion: "How much did you pay in the last 12 months?"
+question: "Rent, Mortgage, Utilities, and Telephone"
+subquestion: "What are your expenses?"
 fields:
   - Rent or Mortgage: users[0].expense_rent
     datatype: currency    
@@ -649,10 +649,14 @@ fields:
     datatype: currency
     default: 0
     min: 0
+  - Telephone: users[0].expense_telephone
+    datatype: currency
+    default: 0
+    min: 0
 ---
 id: health expenses amount
-question: "Health"
-subquestion: "How much did you pay in the last 12 months?"
+question: "Health insurance and Uninsured Medical Expenses"
+subquestion: "What are your expenses?"
 fields:
   - Uninsured medical expenses: users[0].expense_uninsured_medical
     datatype: currency
@@ -664,8 +668,8 @@ fields:
     min: 0
 ---
 id: variable expenses amount
-question: "Variable expenses"
-subquestion: "How much did you spend in the last 12 months?"
+question: "Food, Clothing, Laundry, and Cleaning"
+subquestion: "What are your expenses?"
 fields:
   - Food: users[0].expense_food
     datatype: currency
@@ -679,14 +683,10 @@ fields:
     datatype: currency
     default: 0
     min: 0
-  - Telephone: users[0].expense_telephone
-    datatype: currency
-    default: 0
-    min: 0
 ---
 id: transport expenses
-question: "Transportation"
-subquestion: "How much did you pay in the last 12 months?"
+question: "Transportation and Car Insurance"
+subquestion: "What are expenses?"
 fields:
   - Transportation Expenses: users[0].expense_transportation
     datatype: currency
@@ -698,8 +698,8 @@ fields:
     min: 0
 ---
 id: child related expenses
-question: "Expenses related to children"
-subquestion: "How much did you pay in the last 12 months?"
+question: "Child Education, Child Support, and Child Care"
+subquestion: "What are your expenses?"
 fields:
   - Child Care: users[0].expense_childcare
     datatype: currency
@@ -716,7 +716,7 @@ fields:
 ---
 id: other monthly expenses
 question: |
-  Do you have other monthly expenses that were not mentioned?
+  Do you have other monthly expenses?
 subquestion: |
   Diapers, for example.
 fields: 
