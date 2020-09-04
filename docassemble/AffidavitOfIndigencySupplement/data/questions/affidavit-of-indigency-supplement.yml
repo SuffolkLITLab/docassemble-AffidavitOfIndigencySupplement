@@ -627,7 +627,7 @@ fields:
 ---
 id: fixed expenses amount
 question: "Rent, Mortgage, Utilities, and Telephone"
-subquestion: "What are your expenses?"
+subquestion: "What are your monthly expenses?"
 fields:
   - Rent or Mortgage: users[0].expense_rent
     datatype: currency    
@@ -656,7 +656,7 @@ fields:
 ---
 id: health expenses amount
 question: "Health insurance and Uninsured Medical Expenses"
-subquestion: "What are your expenses?"
+subquestion: "What are your monthly expenses?"
 fields:
   - Uninsured medical expenses: users[0].expense_uninsured_medical
     datatype: currency
@@ -669,7 +669,7 @@ fields:
 ---
 id: variable expenses amount
 question: "Food, Clothing, Laundry, and Cleaning"
-subquestion: "What are your expenses?"
+subquestion: "What are your monthly expenses?"
 fields:
   - Food: users[0].expense_food
     datatype: currency
@@ -686,7 +686,7 @@ fields:
 ---
 id: transport expenses
 question: "Transportation and Car Insurance"
-subquestion: "What are expenses?"
+subquestion: "What are your monthly expenses?"
 fields:
   - Transportation Expenses: users[0].expense_transportation
     datatype: currency
@@ -699,7 +699,7 @@ fields:
 ---
 id: child related expenses
 question: "Child Education, Child Support, and Child Care"
-subquestion: "What are your expenses?"
+subquestion: "What are your monthly expenses?"
 fields:
   - Child Care: users[0].expense_childcare
     datatype: currency
