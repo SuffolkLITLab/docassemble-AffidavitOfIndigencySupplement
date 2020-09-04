@@ -686,7 +686,7 @@ fields:
 ---
 id: transport expenses
 question: "Transportation and Car Insurance"
-subquestion: "What are expenses?"
+subquestion: "What are your expenses?"
 fields:
   - Transportation Expenses: users[0].expense_transportation
     datatype: currency
