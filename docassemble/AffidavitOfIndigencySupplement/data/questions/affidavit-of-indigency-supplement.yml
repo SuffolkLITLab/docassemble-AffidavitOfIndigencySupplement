@@ -375,8 +375,7 @@ code: |
 
   users[0].grade_school_completed
   users[0].training
-  if not users[0].disabilities_yes:
-    users[0].disabilities = 'No Disabilities'
+  users[0].disabilities
   users[0].dependents_number
   users[0].jobs.gather()
   jobs_description
@@ -854,14 +853,12 @@ fields:
 ---
 id: disabilities
 question: |
-  If you have disabilities, do they affect your earning capacity or living expenses?
+  Do you have mental or physical disabilities which affect your income?
+subquestion: |
+  List them and explain how they affect your earning capacity and living expenses:
 fields:
-  - no label: users[0].disabilities_yes
-    datatype: yesnoradio
   - no label: users[0].disabilities
-    show if: users[0].disabilities_yes
-  - note: If you wish to disclose them, describe how your disabilties affect your earning capacity or living expenses.
-    show if: users[0].disabilities_yes
+    required: False
 ---
 id: expense calculation 
 code: | 
