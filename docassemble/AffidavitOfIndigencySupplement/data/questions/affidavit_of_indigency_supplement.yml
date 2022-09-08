@@ -338,7 +338,7 @@ fields:
       - Other
   - Describe your highest level of education: user_grade_school_completed
     show if:
-      var: user_grade_school_completed
+      variable: user_grade_school_completed
       is: Other
 ---
 id: itemized job line items
