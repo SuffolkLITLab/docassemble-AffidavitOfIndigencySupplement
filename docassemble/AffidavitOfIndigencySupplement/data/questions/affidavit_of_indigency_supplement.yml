@@ -148,7 +148,7 @@ fields:
 ---
 code: |
   def list_household(all_hh):
-      return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}\n" for hh in all_hh])
+      return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}" for hh in all_hh], comma_string=",\n", and_string=",\n")
 ---
 sections:
   - review_affidavit_of_indigency_supplement: Review your answers
@@ -181,8 +181,8 @@ code: |
   user_owns_home
   user_owns_car
   users[0].accounts.gather()
-  user_has_debts
   user_owns_property
+  user_has_debts
   miscellaneous_facts
   users.gather()
   set_parts(subtitle=str(users))
@@ -329,11 +329,17 @@ fields:
       - 10th grade
       - 11th grade
       - 12th grade
+      - High School Diploma or GED
       - Some college
       - Associates degree
       - Bachelor degree
       - Graduate degree
       - Doctorate degree
+      - Other
+  - Describe your highest level of education: user_grade_school_completed
+    show if:
+      var: user_grade_school_completed
+      is: Other
 ---
 id: itemized job line items
 generic object: ALItemizedJob
@@ -403,8 +409,7 @@ fields:
 ---
 id: dependents
 question: |
-  How many dependents do you claim?
-subquestion: |
+  How many dependents do you have?
 fields:
   - no label: user_dependents_number
     datatype: integer
@@ -433,7 +438,7 @@ question: |
   What are your monthly expenses?
 fields:
   code: |
-    sum((users[0].expenses[source].fields() for source in 
+    sum((users[0].expenses[source].income_fields() for source in 
         ["rent", "electricity", "oil", "gas", "fuel", "water", "telephone"]), [])
 ---
 sets:
@@ -445,7 +450,7 @@ question: |
   What your are expenses for food, clothing, and laundry?
 fields:
   code: |
-    sum((users[0].expenses[source].fields() for source in 
+    sum((users[0].expenses[source].income_fields() for source in 
         ["food", "clothing", "laundry"]), [])
 ---
 sets:
@@ -456,7 +461,7 @@ question: |
   What are your monthly transportation expenses?
 fields:
   code: |
-    sum((users[0].expenses[source].fields() for source in
+    sum((users[0].expenses[source].income_fields() for source in
         ["transportation", "car_insurance"]), [])
 ---
 sets:
@@ -468,7 +473,7 @@ question: |
   What are your monthly child expenses?
 fields:
   code: |
-    sum((users[0].expenses[source].fields() for source in
+    sum((users[0].expenses[source].income_fields() for source in
         ["child_education", "childcare", "child_support"]), [])
 ---
 sets:
@@ -481,7 +486,7 @@ subquestion: |
   Both health insurance and uninsured medical expneses.
 fields:
   code: |
-    sum((users[0].expenses[source].fields() for source in
+    sum((users[0].expenses[source].income_fields() for source in
         ["health_insurance", "uninsured_medical"]), [])
 ---
 id: other monthly expenses
@@ -554,8 +559,8 @@ fields:
 question: |
   Do you own any property?
 subquestion: |
-  This includes real estate and physical property that you haven't already told us about.
-  For example, a piece of land, or a work truck.
+  This includes physical property or real estate that you haven't already told us about.
+  For example, a boat, or expensive jewelry.
 
   % if user_owns_car or user_owns_home:
   You have already said that you own ${ comma_and_list(filter(lambda y: bool(y), [
