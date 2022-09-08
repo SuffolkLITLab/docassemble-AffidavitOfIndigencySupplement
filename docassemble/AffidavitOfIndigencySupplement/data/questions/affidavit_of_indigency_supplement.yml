@@ -23,7 +23,7 @@ metadata:
 mandatory: True
 comment: |
   Global interview metadata
-variable name: interview_metadata["affidavit_to_indigency_supplement"]
+variable name: interview_metadata["affidavit_of_indigency_supplement"]
 data:
   al_weaver_version: "playground"
   generated on: "2022-08-23"
@@ -35,7 +35,7 @@ data:
     A supplement to the Affidavit of Indigency, giving the court detailed information about finances
   original_form: >-
     https://www.mass.gov/doc/supplement-to-the-affidavit-of-indigency/download
-  allowed courts: 
+  allowed courts:
     - "Boston Municipal Court"
     - "District Court"
     - "Housing Court"
@@ -50,7 +50,7 @@ data:
   generate download screen: True
 ---
 code: |
-  interview_metadata['main_interview_key'] =  'affidavit_to_indigency_supplement'
+  interview_metadata['main_interview_key'] =  'affidavit_of_indigency_supplement'
 ---
 code: |
   # This controls the default country and list of states in address field questions
@@ -71,95 +71,118 @@ code: |
 ---
 objects:
   - users: ALPeopleList.using(ask_number=True,target_number=1)
+  - household: ALPeopleList
 ---
 objects:
   - users[i].jobs: ALItemizedJobList.using(
       complete_attribute='complete',
       object_type=ALItemizedJob.using(employer_type=ALIndividual),
       ask_number=True)
-  - users[i].nonemployment: ALIncomeList.using(auto_gather=False)
-  - users[i].household: ALPersonList
-  - users[i].expenses: ALItemizedValueDict.using(complete_attribute="exists")
-  - users[i].accounts: ALAssetList.using(complete_attribute='complete',
-      ask_number=True)
+  - users[i].nonemployment: ALIncomeList
+  - users[i].expenses: ALItemizedValueDict.using(auto_gather=False, complete_attribute="exists")
+  - users[i].accounts: ALAssetList.using(complete_attribute='balance')
+---
+objects:
+  - household[i].employer: ALIndividual
 ---
 id: loop start bank accounts
 question: |
  Do you have any bank accounts that you wish to disclose?
 subquestion: |
-  For example: money market accounts, investment accounts etc. 
-yesno: users[0].account.there_are_any
----
-code: |
-  nonemployment_description = comma_and_list([other.name.text + "\r" for other in users[0].nonemployment])
+  For example: money market accounts, investment accounts etc.
+fields:
+  - no label: users[0].accounts.there_are_any
+    datatype: yesnoradio
 ---
 id: another account
 question: |
   Are there any other accounts that you wish to disclose? 
-yesno: users[0].account.there_is_another
+fields:
+  - no label: users[0].accounts.there_is_another
+    datatype: yesnoradio
 ---
 question: |
-  Tell us about your ${ ordinal(i) } account 
+  Tell us about your ${ ordinal(i) } account
 fields:
-  - 'Account Type': users[0].account[i].name.text
-  - 'Account Balance': users[0].account[i].balance
+  - 'Account Type': users[0].accounts[i].source
+  - 'Account Balance': users[0].accounts[i].balance
     datatype: currency
     default: |
       0.00
 ---
 code: |
-  account_description = comma_and_list([acct.name.text + ", " + str(acct.balance) + "\r" for acct in users[0].account])
+  def list_accounts(accts):
+      return comma_and_list([acct.source for acct in accts], comma_string=',\n', and_string=',\n')
 ---
 id: household members
 question: |
   Do you live with a household member that is employed?
-yesno: users[0].household.there_are_any
+fields:
+  - no label: household.there_are_any
+    datatype: yesnoradio
 ---
-id: household employment
+sets:
+  - household[i].name.first
+  - household[i].name.last
+  - household[i].occupation
+  - household[i].employer_address
+  - household[i].employer_name
+  - household[i].household_income
 question: |
   Describe your ${ ordinal(i) } household member's employment
 fields:
-  - Name of Household Member: users[0].household[i].name.text
-  - Occupation: users[0].household[i].occupation
-  - Employer Name: users[0].household[i].name.employer
-  - Employer Address: users[0].household[i].employer_address
-    address autocomplete: True
-  - Monthly Income: users[0].household[i].household_income
+  - code: household[i].name_fields()
+  - Occupation: household[i].occupation
+  - Monthly Income: household[i].household_income
+    datatype: currency
+  - note: |
+      **Employer's information**
+  - code: household[i].employer.name_fields(person_or_business='unsure')
+  - code: household[i].employer.address.address_fields()
 ---
 question: |
   Do you have another household member that is employed?
-yesno: users[0].household.there_is_another
+fields:
+  - no label: household.there_is_another
+    datatype: yesnoradio
 ---
 code: |
-  household_description = comma_list([hhmember.name.text + ","  + hhmember.occupation + ", " + hhmember.name.employer + ", " + hhmember.employer_address + "," + " " + "$" + str(hhmember.household_income) + "\r" for hhmember in users[0].household])
+  def list_household(all_hh):
+      return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}\n" for hh in all_hh])
 ---
 sections:
-  - review_affidavit_to_indigency_supplement: Review your answers
+  - review_affidavit_of_indigency_supplement: Review your answers
 ---
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
-id: interview_order_affidavit_to_indigency_supplement
+id: interview_order_affidavit_of_indigency_supplement
 code: |
   # Set the allowed courts for this interview
-  allowed_courts = interview_metadata["affidavit_to_indigency_supplement"]["allowed courts"]
-  nav.set_section('review_affidavit_to_indigency_supplement')
+  allowed_courts = interview_metadata["affidavit_of_indigency_supplement"]["allowed courts"]
+  nav.set_section('review_affidavit_of_indigency_supplement')
   # Below sets the user_role by asking a question.
   trial_court
   case_name
   user_grade_school_completed
   set_progress(14)
   users[0].jobs.gather()
+  users[0].nonemployment.gather()
+  list_incomes
   job_description
   user_training
   user_dependents_number
   user_disabilities
+  household.gather()
+  list_household
   users[0].expenses.gathered
   set_progress(28)
   user_income_net
   user_owns_home
   user_owns_car
+  users[0].accounts.gather()
   user_has_debts
+  user_owns_property
   miscellaneous_facts
   users.gather()
   set_parts(subtitle=str(users))
@@ -169,7 +192,7 @@ code: |
   set_progress(57)
   set_progress(71)
   signature_date
-  interview_order_affidavit_to_indigency_supplement = True
+  interview_order_affidavit_of_indigency_supplement = True
 ---
 ###################### Main order ######################
 comment: |
@@ -178,8 +201,8 @@ comment: |
 mandatory: True
 code: |
   al_intro_screen
-  affidavit_to_indigency_supplement_intro
-  interview_order_affidavit_to_indigency_supplement
+  affidavit_of_indigency_supplement_intro
+  interview_order_affidavit_of_indigency_supplement
   signature_date
   # Store anonymous data for analytics / statistics
   store_variables_snapshot(
@@ -189,10 +212,10 @@ code: |
           "reached_interview_end": True,
       },
   )
-  affidavit_to_indigency_supplement_preview_question
+  affidavit_of_indigency_supplement_preview_question
   basic_questions_signature_flow    
   users[0].signature
-  affidavit_to_indigency_supplement_download
+  affidavit_of_indigency_supplement_download
 ---
 variable name: expense_list_dict
 data: !!omap
@@ -203,7 +226,7 @@ data: !!omap
   - gas: "Gas"
   - water: "Water"
   - telephone: "Telephone"
-#  - fuel: "Other Heating/Cooking Fuel"
+  - fuel: "Other Heating/Cooking Fuel"
   - clothing: "Clothing"
   - laundry: "Laundry"
   - transportation: "Transportation"
@@ -212,15 +235,17 @@ data: !!omap
   - childcare: "Childcare"
   - child_support: "Child Support"
   - health_insurance: "Health Insurance"
-  - uninsured: "Medical-Dental (after amount paid by insurance)"
+  - uninsured_medical: "Medical-Dental (after amount paid by insurance)"
+  - other: "Other monthly expenses"
 #  - credit cards: "Credit Card Payments"
-  - other: "Other"
 ---
 code: |
   for key, val in expense_list_dict.items():
     users[0].expenses[key].display_name = val
+  for key, val in expense_list_dict.items():
     users[0].expenses[key].exists
   users[0].expenses.gathered = True
+  users[0].expenses.revisit = True
   users[0].expenses.hook_after_gather()
 ---
 id: how many jobs do you have
@@ -230,13 +255,46 @@ fields:
   - no label: users[0].jobs.target_number
     datatype: integer
 ---
+id: any non-employment incomes
+question: |
+  Do you have any sources of income, not from employment?
+fields:
+  - no label: users[0].nonemployment.there_are_any
+    datatype: yesnoradio
+---
+question: |
+  Tell us about your ${ ordinal(i) } income
+subquestion: |
+  You have already told us about your incomes from ${ list_incomes(users[0].nonemployment) }.
+fields:
+  - Source of income: users[0].nonemployment[i].source
+  - Times per year you recieve this income: users[0].nonemployment[i].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+  - Amount of income: users[0].nonemployment[i].value
+    datatype: currency
+---
+code: |
+  def list_incomes(incomes):
+      return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes.complete_elements()])
+---
+id: any more non-employment incomes
+question: |
+  Do you have any additional sources of income not from employment?
+subquestion: |
+  You have already told us about your incomes from ${ list_incomes(users[0].nonemployment) }.
+fields:
+  - no label: users[0].nonemployment.there_is_another
+    datatype: yesnoradio
+---
 code: |
   job_description = comma_and_list([job.employer_name_address_phone() for job in users[0].jobs])
 ---
 comment: |
   This question is used to introduce your interview. Please customize
 id: Supplement_to_the_Affidavit_of_Indigency
-continue button field: affidavit_to_indigency_supplement_intro
+continue button field: affidavit_of_indigency_supplement_intro
 question: |
   Supplement to the Affidavit of Indigency
 subquestion: |
@@ -280,13 +338,17 @@ fields:
 id: itemized job line items
 generic object: ALItemizedJob
 question: |
-    Enter info from your paystub for your job as a ${ x.name }
+    ${ x.source } Pay
+subquestion: |
+    Enter info from your paystub for your job as a ${ x.source }
+
+    ---
 fields:
-    - ${ word("What is your hourly pay for this job?") if x.is_hourly else word("What are your wages for this job?") }: x.to_add['full time'].value
+    - ${ word("What is the hourly pay for this job?") if x.is_hourly else word("What are your wages for this job?") }: x.to_add['full time'].value
       datatype: currency
       show if:
         code: x.is_part_time is False
-    - ${ word("What is your hourly pay for this job?") if x.is_hourly else word("What are your wages for this job?") }: x.to_add['part time'].value
+    - ${ word("What is the hourly pay for this job?") if x.is_hourly else word("What are your wages for this job?") }: x.to_add['part time'].value
       datatype: currency
       show if:
         code: x.is_part_time is True
@@ -306,14 +368,27 @@ fields:
       required: False
     - Does the job have other incomes?: x.to_add.there_is_another
       datatype: yesnoradio
-    - Does the job have other deductions?: x.to_subtract["other_taxes"].exists
+    - Does the job have other deductions?: x.to_subtract.there_is_another
       datatype: yesnoradio
-    - What are the other deductions for?: x.to_subtract["other_taxes"].display_name
-      show if: x.to_subtract["other_taxes"].exists
-    - How much are the other deductions?: x.to_subtract["other_taxes"].value
-      datatype: currency
-      show if: x.to_subtract["other_taxes"].exists
 ---
+generic object: ALItemizedJob
+code: |
+  x.to_subtract[i].exists = True
+---
+code: |
+  taxes_on_form = set(['medicare', 'social_security', 'state_taxes', 'federal_taxes'])
+---
+code: |
+  expenses_on_form = set(['rent', 'food', 'electricity', 'gas', 'oil', 'water', 'telephone', 
+      'health_insurance', 'uninsured_medical', 'childcare', 'child_education', 'child_support',
+      'clothing', 'laundry', 'car_insurance', 'transportation'])
+---
+generic object: ALItemizedJob
+code: |
+  x.to_subtract[i].exists
+  if x.to_subtract[i].exists:
+    x.to_subtract[i].value
+  x.to_subtract[i].complete = True
 ---
 id: special training
 question: |
@@ -345,42 +420,12 @@ fields:
     maxlength: 336
     required: False
 ---
-id: taxes
-question: |
-  Taxes
-fields:
-  - "Federal tax deducted": user_tax_federal
-    datatype: currency
-    min: 0
-  - "State tax deducted": user_tax_state
-    datatype: currency
-    min: 0
-  - "Social security tax deducted": user_tax_social_security
-    datatype: currency
-    min: 0
-  - "Medicare tax deducted": user_tax_medicare
-    datatype: currency
-    min: 0
-  - "User tax other amount": user_tax_other_amount
-    datatype: currency
-    min: 0
-  - "Other type of tax withheld": user_tax_other
-    maxlength: 21
-  - "Other tax withheld": user_tax_total
-    datatype: currency
-    min: 0
-  - "User househould member work name": user_househould_member_work_name
-    input type: area
-    maxlength: 336
----
-code: |
-  user_income_after_tax = users[0].jobs.net_total(times_per_year=12)
----
 sets:
   - users[0].expenses['rent'].exists
   - users[0].expenses['electricity'].exists
   - users[0].expenses['oil'].exists
   - users[0].expenses['gas'].exists
+  - users[0].expenses['fuel'].exists
   - users[0].expenses['water'].exists
   - users[0].expenses['telephone'].exists
 id: fixed expenses amount
@@ -389,7 +434,7 @@ question: |
 fields:
   code: |
     sum((users[0].expenses[source].fields() for source in 
-        ["rent", "electricity", "oil", "gas", "water", "telephone"]), [])
+        ["rent", "electricity", "oil", "gas", "fuel", "water", "telephone"]), [])
 ---
 sets:
   - users[0].expenses['food'].exists
@@ -405,7 +450,7 @@ fields:
 ---
 sets:
   - users[0].expenses['transportation'].exists
-  - users[0].expenses['care_insurance'].exists
+  - users[0].expenses['car_insurance'].exists
 id: transport expenses
 question: |
   What are your monthly transportation expenses?
@@ -426,6 +471,9 @@ fields:
     sum((users[0].expenses[source].fields() for source in
         ["child_education", "childcare", "child_support"]), [])
 ---
+sets:
+  - users[0].expenses['health_insurance'].exists
+  - users[0].expenses['uninsured_medical'].exists
 id: health expenses amount
 question: |
   What are your monthly health expenses?
@@ -434,7 +482,7 @@ subquestion: |
 fields:
   code: |
     sum((users[0].expenses[source].fields() for source in
-        ["health_insurance", "uninsured"]), [])
+        ["health_insurance", "uninsured_medical"]), [])
 ---
 id: other monthly expenses
 question: |
@@ -451,18 +499,18 @@ fields:
     min: 0
 ---
 code: |
-  user_income_net = users[0].jobs.net_total(times_per_year=12) - user_expenses_total
+  user_income_net = users[0].jobs.net_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12) - users[0].expenses.total()
 ---
 id: name of one itemized job in list
 generic object: ALItemizedJobList
 question: |
-  What is the your job title for your ${ordinal(i)} job?
+  What is the the job title of your ${ 'primary' if i == 0 else ordinal(i)} job?
 subquestion: |
   % if len(users[0].jobs.complete_elements()) > 0:
-  You've already told us about being a ${ comma_and_list([job.name for job in users[0].jobs.complete_elements()]) }.
+  You've already told us about being a ${ comma_and_list([job.source for job in users[0].jobs.complete_elements()]) }.
   % endif
 fields:
-  - Job title: users[0].jobs.name
+  - Job title: users[0].jobs[i].source
 ---
 id: home ownership
 question: |
@@ -503,38 +551,40 @@ fields:
     datatype: currency
     min: 0
 ---
-id: bank accounts
 question: |
-  What is the balance of your bank accounts?
-fields:
-  - "Checking account": user_checking_balance
-    datatype: currency
-    default: |
-      0.00
-  - "Savings Account": user_savings_balance
-    datatype: currency
-    default: |
-      0.00
----
-question: |
-  What is the value of your property?
+  Do you own any property?
 subquestion: |
-  List all real estate and physical property that you haven't alread listed, and its value.
+  This includes real estate and physical property that you haven't already told us about.
+  For example, a piece of land, or a work truck.
 
-  For example, work truck $10,000, business $2,000.
+  % if user_owns_car or user_owns_home:
+  You have already said that you own ${ comma_and_list(filter(lambda y: bool(y), [
+      f"a house worth {currency(user_home_value)}" if user_owns_home else "",
+      f"a car worth {currency(user_car_value)}" if user_owns_car else ""
+  ])) }.
+  % endif
 fields:
-  - no label: user_property_type
-  - value: user_property_value
+  - no label: user_owns_property
+    input type: radio
+    choices:
+      - Yes, I own additional property: True
+      - No, I don't own any additional property: False
+  - List the property that you own: user_property_type
+    input type: area
+    show if: user_owns_property
+  - Combined value of the property: user_property_value
     datatype: currency
+    show if: user_owns_property
 ---
 id: debts
 question: |
   Do you have any unpaid debts?
-subquestion: |
-  If yes, enter debt type and amount
 fields:
   - no label: user_has_debts
-    datatype: yesnoradio
+    input type: radio
+    choices:
+      - Yes, I have unpaid debts: True
+      - No, I don't have unpaid debts: False
   - note: Enter debt type and amount
     show if: user_has_debts
   - 'Specify all debts': user_debts
@@ -548,10 +598,11 @@ question: |
 fields:
   - no label: miscellaneous_facts
     input type: area
+    required: False
     rows: 4
     maxlength: 420
 ---
-id: preview affidavit_to_indigency_supplement
+id: preview affidavit_of_indigency_supplement
 question: |
   Preview your form before you sign it
 subquestion: |
@@ -562,16 +613,13 @@ subquestion: |
   Click the image to open it in a new tab. Click the "Edit answers" button
   to edit your answers.
 
-  ${ action_button_html(url_action('review_affidavit_to_indigency_supplement'), label='Edit answers', color='info') }
+  ${ action_button_html(url_action('review_affidavit_of_indigency_supplement'), label='Edit answers', color='info') }
   
   Remember to come back to this window to continue and sign your form.
-continue button field: affidavit_to_indigency_supplement_preview_question    
+continue button field: affidavit_of_indigency_supplement_preview_question
 ---
 code: |
   signature_fields = ['users[0].signature']
----
-code: |
-  user_expenses_total = users[0].expenses.total()
 ---
 code: |
   # This is a placeholder for the addresses that will be searched
@@ -579,8 +627,20 @@ code: |
   # a different address than the user's
   addresses_to_search = [user.address for user in users]
 ---
+sets:
+  - x.employer.name.first
+id: employer
+generic object: ALItemizedJob
+question: |
+  Tell us who employs you as a ${ x.source }
+fields:
+  - code: x.employer.name_fields(person_or_business='unsure') 
+  - code: x.employer.address.address_fields()
+  - Phone number: x.employer.phone_number
+    required: False
+---
 id: affidavit to indigency supplement review screen
-event: review_affidavit_to_indigency_supplement
+event: review_affidavit_of_indigency_supplement
 question: |
   Review your answers
 review:
@@ -619,158 +679,75 @@ review:
     button: |
       **Number of dependents**:
       ${ user_dependents_number }
-  - Edit: user_income_nonemployment
+  - Edit: user[0].nonemployment.revisit
     button: |
       **Income, not from employment**:
-      > ${ single_paragraph(user_income_nonemployment) }
-  - Edit: user_tax_federal
+
+      ${ list_incomes(users[0].nonemployment) }
+  - Edit: users[0].jobs.revisit
     button: |
-      **Federal tax deducted**:
-      ${ currency(user_tax_federal) }
-  - Edit: user_tax_state
+      **Monthly income from jobs**
+      ${ currency(users[0].jobs.net_total(times_per_year=12)) }
+  - Edit: household.revisit
     button: |
-      **State tax deducted**:
-      ${ currency(user_tax_state) }
-  - Edit: user_tax_social_security
+      **Household member employment**:
+
+      ${ household }
+  - Edit: users[0].expenses.revisit
     button: |
-      **Social security tax deducted**:
-      ${ currency(user_tax_social_security) }
-  - Edit: user_tax_medicare
-    button: |
-      **Medicare tax deducted**:
-      ${ currency(user_tax_medicare) }
-  - Edit: user_tax_other_amount
-    button: |
-      **User tax other amount**:
-      ${ currency(user_tax_other_amount) }
-  - Edit: user_tax_other
-    button: |
-      **Other type of tax withheld**:
-      ${ user_tax_other }
-  - Edit: user_tax_total
-    button: |
-      **Other tax withheld**:
-      ${ currency(user_tax_total) }
-  - Edit: user_househould_member_work_name
-    button: |
-      **User househould member work name**:
-      > ${ single_paragraph(user_househould_member_work_name) }
-  - Edit: users[0].expenses["rent"]
-    button: |
-      **Rent expences**:
-      ${ currency(users[0].expenses["rent"]) }
-  - Edit: users[0].expenses["uninsured_medical"]
-    button: |
-      **Uninsured medical expenses**:
-      ${ currency(users[0].expenses["uninsured_medical"]) }
-  - Edit: users[0].expenses["childcare"]
-    button: |
-      **Childcare expenses**:
-      ${ currency(users[0].expenses["childcare"]) }
-  - Edit: users[0].expenses["food"]
-    button: |
-      **Food expenses**:
-      ${ currency(users[0].expenses["food"]) }
-  - Edit: users[0].expenses["electricity"]
-    button: |
-      **Electricity expenses**:
-      ${ currency(users[0].expenses["electricity"]) }
-  - Edit: users[0].expenses["education"]
-    button: |
-      **Education expenses**:
-      ${ currency(users[0].expenses["education"]) }
-  - Edit: users[0].expenses["child_support"]
-    button: |
-      **Child support expenses**:
-      ${ currency(users[0].expenses["child_support"]) }
-  - Edit: users[0].expenses["gas"]
-    button: |
-      **Gas expenses**:
-      ${ currency(users[0].expenses["gas"]) }
-  - Edit: users[0].expenses["oil"]
-    button: |
-      **Oil expenses**:
-      ${ currency(users[0].expenses["oil"]) }
-  - Edit: users[0].expenses["clothing"]
-    button: |
-      **Clothing expenses**:
-      ${ currency(users[0].expenses["clothing"]) }
-  - Edit: users[0].expenses["water"]
-    button: |
-      **Water expenses**:
-      ${ currency(users[0].expenses["water"]) }
-  - Edit: users[0].expenses["laundry"]
-    button: |
-      **Laundry expenses**:
-      ${ currency(users[0].expenses["laundry"]) }
-  - Edit: users[0].expenses["telephone"]
-    button: |
-      **Telephone expenses**:
-      ${ currency(users[0].expenses["telephone"]) }
-  - Edit: users[0].expenses["car_insurance"]
-    button: |
-      **Car insurance expenses**:
-      ${ currency(users[0].expenses["car_insurance"]) }
-  - Edit: users[0].expenses["health_insurance"]
-    button: |
-      **Health insurance expenses**:
-      ${ currency(users[0].expenses["health_insurance"]) }
-  - Edit: users[0].expenses["transportation"]
-    button: |
-      **Transportation expenses**:
-      ${ currency(users[0].expenses["transportation"]) }
-  - Edit: users[0].expenses["other"]
-    button: |
-      **Other expenses type**:
-      ${ users[0].expenses["other"] }
+      **Expenses**:
+
+      % for key in users[0].expenses.keys():
+      % if users[0].expenses[key].exists:
+        * ${ expense_list_dict.get(key, key) }: ${ currency(users[0].expenses[key].value) }
+      % endif
+      % endfor
   - Edit: user_owns_home
     button: |
-      **Owns home**:
-      ${ word(yesno(user_owns_home)) }
-  - Edit: user_home_value
-    button: |
+      **${ word("Owns home") if user_owns_home else word("Does not own home") }**
+
+      % if user_owns_home:
       **Home value**:
       ${ currency(user_home_value) }
-  - Edit: user_home_debt
-    button: |
+
       **Home debt**:
-      ${ user_home_debt }
+      ${ currency(user_home_debt) }
+      % endif
   - Edit: user_owns_car
     button: |
-      **Owns car**:
-      ${ word(yesno(user_owns_car)) }
-  - Edit: user_car_year
-    button: |
+      **${ word("Owns car") if user_owns_car else word("Does not own car") }**
+
+      % if user_owns_car:
       **Car year**:
       ${ user_car_year }
-  - Edit: user_car_make
-    button: |
+
       **Car make**:
       ${ user_car_make }
-  - Edit: user_car_value
-    button: |
+
       **Car value**:
       ${ currency(user_car_value) }
-  - Edit: user_car_debt
-    button: |
+
       **Car debt**:
-      ${ user_car_debt }
-  - Edit: user_accounts_balance
+      ${ currency(user_car_debt) }
+      % endif
+  - Edit: users[0].accounts.revisit
     button: |
-      **Accounts balance**:
-      > ${ single_paragraph(user_accounts_balance) }
-  - Edit: user_accounts_type
+      **Accounts**:
+
+      % for acct in users[0].accounts:
+      * ${ acct }
+      % endfor
+  - Edit: user_owns_property
     button: |
-      **Accounts type**:
-      > ${ single_paragraph(user_accounts_type) }
-  - Edit: user_property_type
-    button: |
-      **Property type**:
-      > ${ single_paragraph(user_property_type) }
-  - Edit: user_property_value
-    button: |
-      **Property value**:
-      > ${ single_paragraph(user_property_value) }
+      % if user_owns_property:
+      **Additional Property**:
+      
+      % for prop_type, prop_val in zip(user_property_type.split('\n'), user_property_value.split('\n')):
+      * ${ user_property_type }: ${ currency(user_property_value) }
+      % endfor
+      % else:
+      **Owns no additional property.**
+      % endif
   - Edit: user_debts
     button: |
       **Debts**:
@@ -809,10 +786,83 @@ edit:
   - birthdate
   - signature
 confirm: True
-
 ---
-id: download affidavit_to_indigency_supplement
-event: affidavit_to_indigency_supplement_download
+table: users[0].jobs[i].to_subtract.table
+rows: x
+columns:
+  - Type: |
+      row_index
+  - Amount: |
+      '$0' if hasattr(row_item, 'exists') and not row_item.exists else currency(row_item.value)
+edit:
+  - exists
+  - value
+---
+table: users[0].jobs[i].to_add.table
+rows: x
+columns:
+  - Type: |
+      row_index
+  - Amount: |
+      '$0' if hasattr(row_item, 'exists') and not row_item.exists else currency(row_item.value)
+edit:
+  - exists
+  - value
+---
+continue button field: household.revisit
+question: |
+  Edit household members
+subquestion: |
+  ${ household.table }
+
+  ${ household.add_action() }
+---
+table: household.table
+rows: household
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Occupation: |
+      row_item.occupation
+  - Income: |
+      row_item.household_income
+  - Employer: |
+      row_item.employer.name.full()
+edit:
+  - name.first
+  - occupation
+  - household_income
+  - employer.name.first
+---
+continue button field: users[0].expenses.revisit
+question: |
+  Edit expenses
+subquestion: |
+  ${ users[0].expenses.table }
+
+  ${ users[0].expenses.add_action() }
+---
+continue button field: users[0].accounts.revisit
+question: |
+  Edit accounts
+subquestion: |
+  ${ users[0].accounts.table }
+
+  ${ users[0].accounts.add_action() }
+---
+table: users[0].accounts.table
+rows: users[0].accounts
+columns:
+  - Name: |
+      row_item.name
+  - Amount: |
+      row_item.balance
+edit:
+  - name
+  - balance
+---
+id: download affidavit_of_indigency_supplement
+event: affidavit_of_indigency_supplement_download
 question: |
   All done
 subquestion: |
@@ -820,7 +870,7 @@ subquestion: |
   
   View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
 
-  ${ action_button_html(url_action('review_affidavit_to_indigency_supplement'), label='Edit answers', color='info') }
+  ${ action_button_html(url_action('review_affidavit_of_indigency_supplement'), label='Edit answers', color='info') }
   
   
   ${ al_user_bundle.download_list_html() }
@@ -831,24 +881,24 @@ subquestion: |
 progress: 100
 ---
 objects:
-  - affidavit_to_indigency_supplement_post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_to_indigency_supplement_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
-  - affidavit_to_indigency_supplement_attachment: ALDocument.using(title="Supplement to the Affidavit of Indigency", filename="affidavit_to_indigency_supplement.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - affidavit_of_indigency_supplement_post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_of_indigency_supplement_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - affidavit_of_indigency_supplement_attachment: ALDocument.using(title="Supplement to the Affidavit of Indigency", filename="affidavit_of_indigency_supplement.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_to_indigency_supplement_post_interview_instructions,affidavit_to_indigency_supplement_attachment], filename="affidavit_to_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[affidavit_to_indigency_supplement_attachment], filename="affidavit_to_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_post_interview_instructions,affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
 ---
 attachments:
   - name: affidavit to indigency supplement post interview instructions
-    filename: Post-interview-instructions     
-    variable name: affidavit_to_indigency_supplement_post_interview_instructions[i]        
+    filename: Post-interview-instructions
+    variable name: affidavit_of_indigency_supplement_post_interview_instructions[i]
     skip undefined: True
-    docx template file: affidavit_to_indigency_supplement_next_steps.docx
+    docx template file: affidavit_of_indigency_supplement_next_steps.docx
   - name: affidavit to indigency supplement attachment
-    filename: affidavit_to_indigency_supplement.pdf     
-    variable name: affidavit_to_indigency_supplement_attachment[i]        
+    filename: affidavit_of_indigency_supplement.pdf
+    variable name: affidavit_of_indigency_supplement_attachment[i]
     skip undefined: True
-    pdf template file: affidavit_to_indigency_supplement.pdf
+    pdf template file: affidavit_of_indigency_supplement.pdf
     fields:
       - "court_name": ${ trial_court }
       - "case_name": ${ case_name }
@@ -862,54 +912,54 @@ attachments:
       - "user_disabilities": ${ user_disabilities }
       - "user_dependents_number": ${ user_dependents_number }
       - "user_work_name": ${ job_description }
-      - "user_income_nonemployment": ${ user_income_nonemployment }
-      - "user_income_gross_annual": ${ currency(users[0].jobs.gross_total(times_per_year=1)) }
-      - "user_income_gross_monthly": ${ currency(users[0].jobs.gross_total(times_per_year=12)) }
-      - "user_tax_federal": ${ currency(users[0].jobs.deduction_total(source='federal_tax', times_per_year=12)) }
-      - "user_tax_state": ${ currency(users[0].jobs.deduction_total(source='state_tax', times_per_year=12)) }
-      - "user_tax_social_security": ${ currency(users[0].jobs.deduction_total(source='social_security', times_per_year=12)) }
-      - "user_tax_medicare": ${ currency(users[0].jobs.deduction_total(source='medicare', times_per_year=12)) }
-      - "user_tax_other_amount": ${ currency(users[0].jobs.deduction_total(source='other', times_per_year=12)) }
-      - "user_tax_other": ${ user_tax_other }
-      - "user_tax_total": ${ currency(user[0].jobs.deduction_total(sources=['federal_tax', 'state_tax', 'social_security', 'medicare', 'other_tax'], times_per_year=12)) }
-      - "user_income_after_tax1": ${ currency(users[0].jobs.net_total(times_per_year=12)) }
-      - "user_househould_member_work_name": ${ user_househould_member_work_name }
-      - "user_income_after_tax2": ${ currency(users[0].jobs.net_total(times_per_year=12)) }
-      - "user_expense_rent": ${ currency(users[0].expenses["rent"]) }
-      - "user_expense_uninsured_medical": ${ currency(user[0].expense_uninsured_medical) }
-      - "user_expense_childcare": ${ currency(user[0].expenses["childcare"]) }
-      - "user_expense_food": ${ currency(user[0].expenses["food"]) }
-      - "user_expense_electricity": ${ currency(user[0].expenses["electricity"]) }
-      - "user_expense_education": ${ currency(users[0].expenses["child education"]) }
-      - "user_expense_child_support": ${ currency(users[0].expense["child_support"]) }
-      - "user_expense_gas": ${ currency(users[0].expense["gas"]) }
-      - "user_expense_oil": ${ currency(users[0].expenses["oil"]) }
-      - "user_expense_clothing": ${ currency(users[0].expenses["clothing"]) }
-      - "user_expense_water": ${ currency(users[0].expenses["water"]) }
-      - "user_expense_laundry": ${ currency(users[0].expenses["laundry"]) }
-      - "user_expense_telephone": ${ currency(users[0].expenses["telephone"]) }
-      - "user_expense_car_insurance": ${ currency(users[0].expenses["car_insurance"]) }
-      - "user_expense_health_insurance": ${ currency(users[0].expenses["health_insurance"]) }
-      - "user_expense_transportation": ${ currency(users[0].expenses["transportation"]) }
-      - "user_expense_other_amount": ${ currency(users[0].expenses["other"]) }
-      - "user_expense_other": ${ users[0].expenses["other"] }
-      - "user_expense_total": ${ user_expenses_total }
-      - "user_income_net": ${ currency(user_income_net) }
+      - "user_income_nonemployment": ${ list_incomes(users[0].nonemployment) }
+      - "user_income_gross_annual": ${ thousands(users[0].jobs.gross_total(times_per_year=1) + users[0].nonemployment.total(times_per_year=1), show_decimals=True) }
+      - "user_income_gross_monthly": ${ thousands(users[0].jobs.gross_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12), show_decimals=True) }
+      - "user_tax_federal": ${ thousands(users[0].jobs.deduction_total(source='federal_taxes', times_per_year=12), show_decimals=True) }
+      - "user_tax_state": ${ thousands(users[0].jobs.deduction_total(source='state_taxes', times_per_year=12), show_decimals=True) }
+      - "user_tax_social_security": ${ thousands(users[0].jobs.deduction_total(source='social_security', times_per_year=12), show_decimals=True) }
+      - "user_tax_medicare": ${ thousands(users[0].jobs.deduction_total(source='medicare', times_per_year=12), show_decimals=True) }
+      - "user_tax_other_amount": ${ thousands(users[0].jobs.deduction_total(exclude_source=["federal_taxes", "state_taxes", "social_security", "medicare"], times_per_year=12), show_decimals=True) }
+      - "user_tax_other": ${ comma_and_list([name for name in users[0].jobs.sources(which_side='deductions') if name not in taxes_on_form]) }
+      - "user_tax_total": ${ thousands(users[0].jobs.deduction_total(times_per_year=12), show_decimals=True) }
+      - "user_income_after_tax1": ${ thousands(users[0].jobs.net_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12), show_decimals=True) }
+      - "user_househould_member_work_name": ${ list_household(household) }
+      - "user_income_after_tax2": ${ thousands(users[0].jobs.net_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12), show_decimals=True) }
+      - "user_expense_rent": ${ thousands(users[0].expenses["rent"], show_decimals=True) }
+      - "user_expense_uninsured_medical": ${ thousands(users[0].expenses["uninsured_medical"], show_decimals=True) }
+      - "user_expense_childcare": ${ thousands(users[0].expenses["childcare"], show_decimals=True) }
+      - "user_expense_food": ${ thousands(users[0].expenses["food"], show_decimals=True) }
+      - "user_expense_electricity": ${ thousands(users[0].expenses["electricity"], show_decimals=True) }
+      - "user_expense_education": ${ thousands(users[0].expenses["child_education"], show_decimals=True) }
+      - "user_expense_child_support": ${ thousands(users[0].expenses["child_support"], show_decimals=True) }
+      - "user_expense_gas": ${ thousands(users[0].expenses["gas"], show_decimals=True) }
+      - "user_expense_oil": ${ thousands(users[0].expenses["oil"], show_decimals=True) }
+      - "user_expense_clothing": ${ thousands(users[0].expenses["clothing"], show_decimals=True) }
+      - "user_expense_water": ${ thousands(users[0].expenses["water"], show_decimals=True) }
+      - "user_expense_laundry": ${ thousands(users[0].expenses["laundry"], show_decimals=True) }
+      - "user_expense_telephone": ${ thousands(users[0].expenses["telephone"], show_decimals=True) }
+      - "user_expense_car_insurance": ${ thousands(users[0].expenses["car_insurance"], show_decimals=True) }
+      - "user_expense_health_insurance": ${ thousands(users[0].expenses["health_insurance"], show_decimals=True) }
+      - "user_expense_transportation": ${ thousands(users[0].expenses["transportation"], show_decimals=True) }
+      - "user_expense_other_amount": ${ thousands(users[0].expenses["other"], show_decimals=True) }
+      - "user_expense_other": ${ comma_and_list(set(users[0].expenses.keys()).difference(expenses_on_form)) }
+      - "user_expense_total": ${ thousands(users[0].expenses.total(), show_decimals=True) }
+      - "user_income_net": ${ thousands(user_income_net, show_decimals=True) }
       - "user_owns_home_yes": ${ user_owns_home }
       - "user_owns_home_no": ${ not user_owns_home }
-      - "user_home_value": ${ currency(user_home_value) }
-      - "user_home_debt": ${ user_home_debt }
+      - "user_home_value": ${ thousands(user_home_value, show_decimals=True) }
+      - "user_home_debt": ${ thousands(user_home_debt, show_decimals=True) }
       - "user_owns_car_yes": ${ user_owns_car }
       - "user_owns_car_no": ${ not user_owns_car }
       - "user_car_year": ${ user_car_year }
       - "user_car_make": ${ user_car_make }
-      - "user_car_value": ${ currency(user_car_value) }
-      - "user_car_debt": ${ user_car_debt }
-      - "user_accounts_balance": ${ user_accounts_balance }
-      - "user_accounts_type": ${ user_accounts_type }
-      - "user_property_type": ${ user_property_type }
-      - "user_property_value": ${ user_property_value }
-      - "user_debts": ${ user_debts }
+      - "user_car_value": ${ thousands(user_car_value, show_decimals=True) }
+      - "user_car_debt": ${ thousands(user_car_debt, show_decimals=True) }
+      - "user_accounts_balance": ${ comma_and_list([currency(ac.balance) for ac in users[0].accounts], comma_string=',\n', and_string=',\n') }
+      - "user_accounts_type": ${ list_accounts(users[0].accounts) }
+      - "user_property_type": ${ user_property_type if user_owns_property else "" }
+      - "user_property_value": ${ user_property_value if user_owns_property else "" }
+      - "user_debts": ${ thousands(user_debts, show_decimals=True) }
       - "miscellaneous_facts": ${ miscellaneous_facts }
       - "users1_signature": ${ users[0].signature_if_final(i) }
       - "users1_address_line_one": ${ users[0].address.line_one() }
