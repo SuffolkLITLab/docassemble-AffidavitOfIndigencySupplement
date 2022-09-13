@@ -85,71 +85,6 @@ objects:
 objects:
   - household[i].employer: ALIndividual
 ---
-id: loop start bank accounts
-question: |
- Do you have any bank accounts that you wish to disclose?
-subquestion: |
-  For example: money market accounts, investment accounts etc.
-fields:
-  - no label: users[0].accounts.there_are_any
-    datatype: yesnoradio
----
-id: another account
-question: |
-  Are there any other accounts that you wish to disclose? 
-fields:
-  - no label: users[0].accounts.there_is_another
-    datatype: yesnoradio
----
-question: |
-  Tell us about your ${ ordinal(i) } account
-fields:
-  - 'Account Type': users[0].accounts[i].source
-  - 'Account Balance': users[0].accounts[i].balance
-    datatype: currency
-    default: |
-      0.00
----
-code: |
-  def list_accounts(accts):
-      return comma_and_list([acct.source for acct in accts], comma_string=',\n', and_string=',\n')
----
-id: household members
-question: |
-  Do you live with a household member that is employed?
-fields:
-  - no label: household.there_are_any
-    datatype: yesnoradio
----
-sets:
-  - household[i].name.first
-  - household[i].name.last
-  - household[i].occupation
-  - household[i].employer_address
-  - household[i].employer_name
-  - household[i].household_income
-question: |
-  Describe your ${ ordinal(i) } household member's employment
-fields:
-  - code: household[i].name_fields()
-  - Occupation: household[i].occupation
-  - Monthly Income: household[i].household_income
-    datatype: currency
-  - note: |
-      **Employer's information**
-  - code: household[i].employer.name_fields(person_or_business='unsure')
-  - code: household[i].employer.address.address_fields()
----
-question: |
-  Do you have another household member that is employed?
-fields:
-  - no label: household.there_is_another
-    datatype: yesnoradio
----
-code: |
-  def list_household(all_hh):
-      return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}" for hh in all_hh], comma_string=",\n", and_string=",\n")
----
 sections:
   - review_affidavit_of_indigency_supplement: Review your answers
 ---
@@ -226,7 +161,7 @@ data: !!omap
   - gas: "Gas"
   - water: "Water"
   - telephone: "Telephone"
-  - fuel: "Other Heating/Cooking Fuel"
+  - fuel: "Other Heating or Cooking Fuel"
   - clothing: "Clothing"
   - laundry: "Laundry"
   - transportation: "Transportation"
@@ -238,6 +173,71 @@ data: !!omap
   - uninsured_medical: "Medical-Dental (after amount paid by insurance)"
   - other: "Other monthly expenses"
 #  - credit cards: "Credit Card Payments"
+---
+id: loop start bank accounts
+question: |
+ Do you have any bank accounts that you wish to disclose?
+subquestion: |
+  For example: money market accounts, investment accounts etc.
+fields:
+  - no label: users[0].accounts.there_are_any
+    datatype: yesnoradio
+---
+id: another account
+question: |
+  Are there any other accounts that you wish to disclose? 
+fields:
+  - no label: users[0].accounts.there_is_another
+    datatype: yesnoradio
+---
+question: |
+  Tell us about your ${ ordinal(i) } account
+fields:
+  - 'Account Type': users[0].accounts[i].source
+  - 'Account Balance': users[0].accounts[i].balance
+    datatype: currency
+    default: |
+      0.00
+---
+code: |
+  def list_accounts(accts):
+      return comma_and_list([acct.source for acct in accts], comma_string=',\n', and_string=',\n')
+---
+id: household members
+question: |
+  Do you live with a household member that is employed?
+fields:
+  - no label: household.there_are_any
+    datatype: yesnoradio
+---
+sets:
+  - household[i].name.first
+  - household[i].name.last
+  - household[i].occupation
+  - household[i].employer_address
+  - household[i].employer_name
+  - household[i].household_income
+question: |
+  Describe your ${ ordinal(i) } household member's employment
+fields:
+  - code: household[i].name_fields()
+  - Occupation: household[i].occupation
+  - Monthly Income: household[i].household_income
+    datatype: currency
+  - note: |
+      **Employer's information**
+  - code: household[i].employer.name_fields(person_or_business='unsure')
+  - code: household[i].employer.address.address_fields()
+---
+question: |
+  Do you have another household member that is employed?
+fields:
+  - no label: household.there_is_another
+    datatype: yesnoradio
+---
+code: |
+  def list_household(all_hh):
+      return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}" for hh in all_hh], comma_string=",\n", and_string=",\n")
 ---
 code: |
   for key, val in expense_list_dict.items():
@@ -291,14 +291,14 @@ fields:
 code: |
   job_description = comma_and_list([job.employer_name_address_phone() for job in users[0].jobs])
 ---
-comment: |
-  This question is used to introduce your interview. Please customize
 id: Supplement_to_the_Affidavit_of_Indigency
 continue button field: affidavit_of_indigency_supplement_intro
 question: |
   Supplement to the Affidavit of Indigency
 subquestion: |
-  If you cannot pay for court fees or costs, you may be eligible to have the state cover them. If you checked C on the Affidavit of Indigency, you must fill out this form.
+  If you cannot pay for court fees or costs, you may be eligible to have the
+  state cover them. If you checked C on the Affidavit of Indigency, you must
+  fill out this form.
 ---
 id: case info
 question: |
@@ -559,7 +559,7 @@ fields:
 question: |
   Do you own any property?
 subquestion: |
-  This includes physical property or real estate that you haven't already told us about.
+  This includes physical property or real estate that you have not already told us about.
   For example, a boat, or expensive jewelry.
 
   % if user_owns_car or user_owns_home:
@@ -573,7 +573,7 @@ fields:
     input type: radio
     choices:
       - Yes, I own additional property: True
-      - No, I don't own any additional property: False
+      - No, I do not own any additional property: False
   - List the property that you own: user_property_type
     input type: area
     show if: user_owns_property
@@ -589,7 +589,7 @@ fields:
     input type: radio
     choices:
       - Yes, I have unpaid debts: True
-      - No, I don't have unpaid debts: False
+      - No, I do not have unpaid debts: False
   - note: Enter debt type and amount
     show if: user_has_debts
   - 'Specify all debts': user_debts
@@ -639,8 +639,10 @@ generic object: ALItemizedJob
 question: |
   Tell us who employs you as a ${ x.source }
 fields:
-  - code: x.employer.name_fields(person_or_business='unsure') 
-  - code: x.employer.address.address_fields()
+  - I am self employed: x.is_self_employed
+    datatype: yesno
+  - code: x.employer.name_fields(person_or_business='unsure', show_if=x.attr_name('is_self_employed'))
+  - code: x.employer.address.address_fields(show_if=x.attr_name('is_self_employed'))
   - Phone number: x.employer.phone_number
     required: False
 ---
