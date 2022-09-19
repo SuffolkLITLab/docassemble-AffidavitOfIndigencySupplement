@@ -79,7 +79,7 @@ objects:
       object_type=ALItemizedJob.using(employer_type=ALIndividual),
       ask_number=True)
   - users[i].nonemployment: ALIncomeList
-  - users[i].expenses: ALItemizedValueDict.using(auto_gather=False, complete_attribute="exists")
+  - users[i].expenses: ALExpenses.using(auto_gather=False, complete_attribute="exists")
   - users[i].accounts: ALAssetList.using(complete_attribute='balance')
 ---
 objects:
@@ -100,14 +100,14 @@ code: |
   trial_court
   case_name
   user_grade_school_completed
+  user_disabilities
+  user_dependents_number
   set_progress(14)
   users[0].jobs.gather()
   users[0].nonemployment.gather()
   list_incomes
   job_description
   user_training
-  user_dependents_number
-  user_disabilities
   household.gather()
   list_household
   users[0].expenses.gathered
@@ -239,15 +239,6 @@ code: |
   def list_household(all_hh):
       return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}" for hh in all_hh], comma_string=",\n", and_string=",\n")
 ---
-code: |
-  for key, val in expense_list_dict.items():
-    users[0].expenses[key].display_name = val
-  for key, val in expense_list_dict.items():
-    users[0].expenses[key].exists
-  users[0].expenses.gathered = True
-  users[0].expenses.revisit = True
-  users[0].expenses.hook_after_gather()
----
 id: how many jobs do you have
 question: |
   How many jobs do you have?
@@ -260,14 +251,38 @@ question: |
   Do you have any sources of income, not from employment?
 fields:
   - no label: users[0].nonemployment.there_are_any
+    help: For example, social security, or disability benefits
     datatype: yesnoradio
 ---
 question: |
   Tell us about your ${ ordinal(i) } income
 subquestion: |
-  You have already told us about your incomes from ${ list_incomes(users[0].nonemployment) }.
+  For example, you might recieve disability benefits (SSDI) for $1000 once a month.
+  % if i > 0:
+  You have already told us about your incomes from ${ list_incomes(users[0].nonemployment.completed()) }.
+  % endif
 fields:
   - Source of income: users[0].nonemployment[i].source
+    input type: dropdown
+    choices:
+      - royalties: Royalties
+      - rental_income: Rental income
+      - interest: Interest
+      - dividents: Dividents
+      - trusts: Trusts
+      - annuities: Annuities
+      - pensions: Pensions
+      - retirement: Retirement
+      - workers_comp: Workers compensation
+      - private_disability_insurance: Private disability insurance
+      - child_support: Child support
+      - alimony: Alimony
+      - contributions: Contributions
+      - other: Other
+  - What type of income?: users[0].nonemployment[i].source
+    show if:
+      variable: users[0].nonemployment[i].source
+      is: other
   - Times per year you recieve this income: users[0].nonemployment[i].times_per_year
     input type: radio
     code: |
@@ -359,20 +374,27 @@ fields:
       show if:
         code: x.is_part_time is True
     - note: |
-        The below amounts are per pay period (${ times_per_year(times_per_year_list=times_per_year_list, times_per_year=x.times_per_year) })
-    - How much do you pay in federal taxes?: x.to_subtract['federal_taxes'].value
+        How much do you pay per pay period (${ times_per_year(times_per_year_list=times_per_year_list, times_per_year=x.times_per_year) }) for:
+    - Federal taxes: x.to_subtract['federal_taxes'].value
       datatype: currency
       required: False
-    - How much do you pay in state taxes?: x.to_subtract['state_taxes'].value
+    - State taxes: x.to_subtract['state_taxes'].value
       datatype: currency
       required: False
-    - How much do you pay towards social security?: x.to_subtract['social_security'].value
+    - Social security: x.to_subtract['social_security'].value
       datatype: currency
       required: False
-    - How much do you pay towards medicare?: x.to_subtract['medicare'].value
+    - Medicare: x.to_subtract['medicare'].value
       datatype: currency
       required: False
+---
+generic object: ALItemizedJob
+question: |
+    Does your job as a ${ x.source } have other incomes or deductions?
+fields:
     - Does the job have other incomes?: x.to_add.there_is_another
+      help: |
+        For example, tips, yearly bonuses, or commission
       datatype: yesnoradio
     - Does the job have other deductions?: x.to_subtract.there_is_another
       datatype: yesnoradio
@@ -418,76 +440,28 @@ id: disabilities
 question: |
   Do you have mental or physical disabilities which affect your income?
 subquestion: |
-  List them and explain how they affect your earning capacity and living expenses.
 fields:
-  - no label: user_disabilities
+  - Do you have any disabilities?: has_disabilities
+    datatype: yesnoradio
+  - note: |
+      List them and explain how they affect your earning capacity and living expenses.
+    show if: has_disabilities
+  - Your disabilities: user_disabilities
     input type: area
     maxlength: 336
     required: False
+    show if: has_disabilities
 ---
-sets:
-  - users[0].expenses['rent'].exists
-  - users[0].expenses['electricity'].exists
-  - users[0].expenses['oil'].exists
-  - users[0].expenses['gas'].exists
-  - users[0].expenses['fuel'].exists
-  - users[0].expenses['water'].exists
-  - users[0].expenses['telephone'].exists
-id: fixed expenses amount
+id: expenses review
 question: |
-  What are your monthly expenses?
-fields:
-  code: |
-    sum((users[0].expenses[source].income_fields() for source in 
-        ["rent", "electricity", "oil", "gas", "fuel", "water", "telephone"]), [])
----
-sets:
-  - users[0].expenses['food'].exists
-  - users[0].expenses['clothing'].exists
-  - users[0].expenses['laundry'].exists
-id: variable expenses amount
-question: |
-  What your are expenses for food, clothing, and laundry?
-fields:
-  code: |
-    sum((users[0].expenses[source].income_fields() for source in 
-        ["food", "clothing", "laundry"]), [])
----
-sets:
-  - users[0].expenses['transportation'].exists
-  - users[0].expenses['car_insurance'].exists
-id: transport expenses
-question: |
-  What are your monthly transportation expenses?
-fields:
-  code: |
-    sum((users[0].expenses[source].income_fields() for source in
-        ["transportation", "car_insurance"]), [])
----
-sets:
-  - users[0].expenses['child_education'].exists
-  - users[0].expenses['childcare'].exists
-  - users[0].expenses['child_support'].exists
-id: child related expenses
-question: |
-  What are your monthly child expenses?
-fields:
-  code: |
-    sum((users[0].expenses[source].income_fields() for source in
-        ["child_education", "childcare", "child_support"]), [])
----
-sets:
-  - users[0].expenses['health_insurance'].exists
-  - users[0].expenses['uninsured_medical'].exists
-id: health expenses amount
-question: |
-  What are your monthly health expenses?
+  Expenses
 subquestion: |
-  Both health insurance and uninsured medical expneses.
-fields:
-  code: |
-    sum((users[0].expenses[source].income_fields() for source in
-        ["health_insurance", "uninsured_medical"]), [])
+  ${ users[0].expenses.table }
+
+  Total monthly expenses: ${ currency(users[0].expenses.total(times_per_year=12))}
+
+  ${ expenses.add_action() }
+field: review_expenses
 ---
 id: other monthly expenses
 question: |
@@ -641,10 +615,25 @@ question: |
 fields:
   - I am self employed: x.is_self_employed
     datatype: yesno
-  - code: x.employer.name_fields(person_or_business='unsure', show_if=x.attr_name('is_self_employed'))
-  - code: x.employer.address.address_fields(show_if=x.attr_name('is_self_employed'))
+  - code: |
+      x.employer.name_fields(person_or_business='unsure', show_if={'variable': 'x.is_self_employed', 'is': 'False'})
+  - code: |
+      x.employer.address.address_fields(show_if={'variable': 'x.is_self_employed', 'is': 'False'})
   - Phone number: x.employer.phone_number
     required: False
+---
+sets:
+  - x.employer.name.first
+generic object: ALItemizedJob
+code: |
+  if x.is_self_employed:
+    x.employer.name = users[0].name
+    x.employer.address = users[0].address
+---
+generic object: ALItemizedJob
+template: x.employer.address.unit_label
+content: |
+  Suite
 ---
 id: affidavit to indigency supplement review screen
 event: review_affidavit_of_indigency_supplement
@@ -704,10 +693,8 @@ review:
     button: |
       **Expenses**:
 
-      % for key in users[0].expenses.keys():
-      % if users[0].expenses[key].exists:
-        * ${ expense_list_dict.get(key, key) }: ${ currency(users[0].expenses[key].value) }
-      % endif
+      % for item in users[0].expenses:
+      * ${ item.display_name }: ${ currency(item.value) }
       % endfor
   - Edit: user_owns_home
     button: |
