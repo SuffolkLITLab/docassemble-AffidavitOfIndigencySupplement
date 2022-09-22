@@ -71,7 +71,7 @@ code: |
 ---
 objects:
   - users: ALPeopleList.using(ask_number=True,target_number=1)
-  - household: ALPeopleList
+  - household: ALPeopleList.using(ask_number=True, complete_attribute='complete')
 ---
 objects:
   - users[i].jobs: ALItemizedJobList.using(
@@ -83,10 +83,16 @@ objects:
   - users[i].accounts: ALAssetList.using(complete_attribute='balance')
 ---
 objects:
-  - household[i].employer: ALIndividual
+  - household[i].jobs: ALJobList.using(complete_attribute='complete',
+        object_type=ALJob.using(employer_type=ALIndividual),
+        ask_number=True)
 ---
 sections:
-  - review_affidavit_of_indigency_supplement: Review your answers
+  - review_case_info: Case and Personal Information
+  - review_income: Income
+  - review_expenses: Expenses
+  - review_assets_and_debts: Assets and Debts
+  - download_form: Download Form
 ---
 #################### Interview order #####################
 comment: |
@@ -95,37 +101,47 @@ id: interview_order_affidavit_of_indigency_supplement
 code: |
   # Set the allowed courts for this interview
   allowed_courts = interview_metadata["affidavit_of_indigency_supplement"]["allowed courts"]
-  nav.set_section('review_affidavit_of_indigency_supplement')
+  nav.set_section('review_case_info')
   # Below sets the user_role by asking a question.
   trial_court
   case_name
+  users.gather()
+  set_parts(subtitle=str(users))
+  users[0].address.address
+  users[0].birthdate
   user_grade_school_completed
-  user_disabilities
+  has_disabilities
   user_dependents_number
   set_progress(14)
+  nav.set_section('review_income')
   users[0].jobs.gather()
-  users[0].nonemployment.gather()
-  list_incomes
   job_description
-  user_training
+  users[0].nonemployment.gathered
+  list_incomes
+  has_special_training
   household.gather()
   list_household
-  users[0].expenses.gathered
+  review_income_screen
   set_progress(28)
+  nav.set_section('review_expenses')
+  users[0].expenses.gathered
+  review_expenses_screen
+  set_progress(42)
   user_income_net
+  nav.set_section('review_assets_and_debts')
   user_owns_home
   user_owns_car
   users[0].accounts.gather()
+  set_progress(57)
+  taxes_on_form
+  expenses_on_form
+  list_accounts_source
+  list_accounts_full
   user_owns_property
   user_has_debts
-  miscellaneous_facts
-  users.gather()
-  set_parts(subtitle=str(users))
-  set_progress(42)
-  users[0].address.address
-  users[0].birthdate
-  set_progress(57)
   set_progress(71)
+  miscellaneous_facts
+  nav.set_section('download_form')
   signature_date
   interview_order_affidavit_of_indigency_supplement = True
 ---
@@ -152,27 +168,47 @@ code: |
   users[0].signature
   affidavit_of_indigency_supplement_download
 ---
-variable name: expense_list_dict
+variable name: expense_terms
 data: !!omap
   - rent: "Rent or Mortgage"
   - food: "Food"
   - electricity: "Electricity"
   - oil: "Oil"
   - gas: "Gas"
+  - fuel: "Other Heating or Cooking Fuel"
   - water: "Water"
   - telephone: "Telephone"
-  - fuel: "Other Heating or Cooking Fuel"
   - clothing: "Clothing"
   - laundry: "Laundry"
-  - transportation: "Transportation"
+  - transportation: "Transportation (including transit purchases)"
   - car_insurance: "Car Insurance"
   - child_education: "Child Education"
   - childcare: "Childcare"
   - child_support: "Child Support"
-  - health_insurance: "Health Insurance"
-  - uninsured_medical: "Medical-Dental (after amount paid by insurance)"
+  - health_insurance: "Medical Insurance (including health, dental, and vision)"
+  - uninsured_medical: "Medical costs (after amount paid by insurance)"
   - other: "Other monthly expenses"
 #  - credit cards: "Credit Card Payments"
+---
+variable name: nonemployment_income_terms
+data: !!omap
+  - royalties: Royalties
+  - rental_income: Rental income
+  - interest: Interest
+  - dividents: Dividents
+  - trusts: Trusts
+  - annuities: Annuities
+  - pensions: Pensions
+  - retirement: Retirement
+  - workers_comp: Workers compensation
+  - private_disability_insurance: Private disability insurance
+  - child_support: Child support
+  - alimony: Alimony
+  - contributions: Contributions
+  - other: Other
+---
+objects:
+  nonemployment_income_terms_ordered: DAOrderedDict.using(elements=nonemployment_income_terms, auto_gather=False, gathered=True)
 ---
 id: loop start bank accounts
 question: |
@@ -186,6 +222,8 @@ fields:
 id: another account
 question: |
   Are there any other accounts that you wish to disclose? 
+subquestion: |
+  You have already told us about your ${ list_accounts_full(users[0].accounts.complete_elements()) }.
 fields:
   - no label: users[0].accounts.there_is_another
     datatype: yesnoradio
@@ -193,15 +231,30 @@ fields:
 question: |
   Tell us about your ${ ordinal(i) } account
 fields:
-  - 'Account Type': users[0].accounts[i].source
-  - 'Account Balance': users[0].accounts[i].balance
+  - Account Type: users[0].accounts[i].source
+    datatype: dropdown
+    code: |
+        account_terms_ordered
+  - Account Balance: users[0].accounts[i].balance
     datatype: currency
-    default: |
-      0.00
 ---
 code: |
-  def list_accounts(accts):
+  def list_accounts_source(accts):
       return comma_and_list([acct.source for acct in accts], comma_string=',\n', and_string=',\n')
+  def list_accounts_full(accts):
+      return comma_and_list([f"{acct.source} ({currency(acct.balance)})" for acct in accts], comma_string=',\n', and_string=',\n')
+---
+code: |
+  household[i].jobs.gather()
+  household[i].jobs.revisit = True
+  household[i].complete = True
+---
+code: |
+  household[i].jobs[j].source
+  household[i].jobs[j].value
+  household[i].jobs[j].employer.name
+  household[i].jobs[j].times_per_year
+  household[i].jobs[j].complete = True
 ---
 id: household members
 question: |
@@ -210,34 +263,51 @@ fields:
   - no label: household.there_are_any
     datatype: yesnoradio
 ---
+question: |
+  How many of your household members are employed?
+subquestion: |
+  A household member is someone you live and share expenses with.
+fields:
+  - no label: household.target_number
+    datatype: integer
+---
 sets:
   - household[i].name.first
   - household[i].name.last
-  - household[i].occupation
-  - household[i].employer_address
-  - household[i].employer_name
-  - household[i].household_income
 question: |
-  Describe your ${ ordinal(i) } household member's employment
+  What is the name of your ${ ordinal(i) } household member?
 fields:
-  - code: household[i].name_fields()
-  - Occupation: household[i].occupation
-  - Monthly Income: household[i].household_income
-    datatype: currency
-  - note: |
-      **Employer's information**
-  - code: household[i].employer.name_fields(person_or_business='unsure')
-  - code: household[i].employer.address.address_fields()
+  code: household[i].name_fields()
+---
+id: household member job number, name or no name
+question: |
+  How many jobs does ${ household[i].name } have?
+fields:
+  - Number of jobs: household[i].jobs.target_number
+    datatype: integer
+---
+id: household member job name
+question: |
+  What is the job title of ${ household[i].name }'s ${ ordinal(j) } job?
+fields:
+  - Job title: household[i].jobs[j].source
 ---
 question: |
   Do you have another household member that is employed?
+subquestion: |
+  You have already told us about ${ comma_and_list(household.complete_elements()) }.
 fields:
   - no label: household.there_is_another
     datatype: yesnoradio
 ---
 code: |
   def list_household(all_hh):
-      return comma_list([f"{hh.name}, works as a {hh.occupation} for {hh.employer.name} ({hh.employer.address}) making ${hh.household_income}" for hh in all_hh], comma_string=",\n", and_string=",\n")
+      member_list = []
+      for member in all_hh:
+          if len(member.jobs) > 0:
+              all_jobs = comma_list([f"a {mem_job.source} for {mem_job.employer.name} ({mem_job.employer.address.on_one_line()})" for mem_job in member.jobs])
+              member_list.append(f"{member.name}, works as {all_jobs}, making {currency(member.jobs.total(times_per_year=12))}")
+      return comma_list(member_list, comma_string=",\n", and_string=",\n")
 ---
 id: how many jobs do you have
 question: |
@@ -248,37 +318,37 @@ fields:
 ---
 id: any non-employment incomes
 question: |
-  Do you have any sources of income, not from employment?
+  Do you have any of the below sources of income, not from employment?
 fields:
-  - no label: users[0].nonemployment.there_are_any
-    help: For example, social security, or disability benefits
-    datatype: yesnoradio
+  - no label: users[0].nonemployment.selected_types
+    datatype: checkboxes
+    code: |
+      nonemployment_income_terms_ordered
+---
+code: |
+  users[0].nonemployment.selected_types
+  users[0].nonemployment.move_checks_to_list(None, nonemployment_income_terms)
+  users[0].nonemployment.moved = True
+---
+code: |
+  users[0].nonemployment.moved
+  for income_type in users[0].nonemployment.elements:
+    income_type.complete
+  users[0].nonemployment.revisit = True
+  users[0].nonemployment.gathered = True
 ---
 question: |
   Tell us about your ${ ordinal(i) } income
 subquestion: |
   For example, you might recieve disability benefits (SSDI) for $1000 once a month.
   % if i > 0:
-  You have already told us about your incomes from ${ list_incomes(users[0].nonemployment.completed()) }.
+  You have already told us about your ${ users[0].nonemployment.complete_elements().as_noun("income") } from ${ list_incomes(users[0].nonemployment.complete_elements()) }.
   % endif
 fields:
   - Source of income: users[0].nonemployment[i].source
     input type: dropdown
-    choices:
-      - royalties: Royalties
-      - rental_income: Rental income
-      - interest: Interest
-      - dividents: Dividents
-      - trusts: Trusts
-      - annuities: Annuities
-      - pensions: Pensions
-      - retirement: Retirement
-      - workers_comp: Workers compensation
-      - private_disability_insurance: Private disability insurance
-      - child_support: Child support
-      - alimony: Alimony
-      - contributions: Contributions
-      - other: Other
+    code: |
+      nonemployment_income_terms_ordered
   - What type of income?: users[0].nonemployment[i].source
     show if:
       variable: users[0].nonemployment[i].source
@@ -290,21 +360,40 @@ fields:
   - Amount of income: users[0].nonemployment[i].value
     datatype: currency
 ---
+question: |
+  Tell us about your ${ users[0].nonemployment[i].source } income
+subquestion: |
+  For example, you might recieve disability benefits (SSDI) for $1000 once a month.
+  % if i > 0:
+  You have already told us about your ${ users[0].nonemployment.complete_elements().as_noun("income") } from ${ list_incomes(users[0].nonemployment) }.
+  % endif
+fields:
+  - Times per year you recieve this income: users[0].nonemployment[i].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+  - Amount of income: users[0].nonemployment[i].value
+    datatype: currency
+---
 code: |
   def list_incomes(incomes):
-      return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes.complete_elements()])
+      if isinstance(incomes, DAList):
+          return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes.complete_elements() if hasattr(income, "times_per_year") and hasattr(income, "value") and hasattr(income, "source")])
+      else:
+          return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes if hasattr(income, "times_per_year") and hasattr(income, "value")])
 ---
 id: any more non-employment incomes
 question: |
   Do you have any additional sources of income not from employment?
 subquestion: |
-  You have already told us about your incomes from ${ list_incomes(users[0].nonemployment) }.
+  You have already told us about your ${ users[0].nonemployment.complete_elements().as_noun("income") } from ${ list_incomes(users[0].nonemployment.complete_elements()) }.
 fields:
   - no label: users[0].nonemployment.there_is_another
     datatype: yesnoradio
 ---
 code: |
-  job_description = comma_and_list([job.employer_name_address_phone() for job in users[0].jobs])
+  def job_description():
+    return comma_and_list([job.employer_name_address_phone() for job in users[0].jobs])
 ---
 id: Supplement_to_the_Affidavit_of_Indigency
 continue button field: affidavit_of_indigency_supplement_intro
@@ -388,6 +477,33 @@ fields:
       datatype: currency
       required: False
 ---
+id: regular job value
+question: |
+  What how much does ${ household[i] } get paid for ${ household[i].jobs[j].source }?
+fields:
+  - Is the job hourly?: household[i].jobs[j].is_hourly
+    datatype: yesnoradio
+  - How often does ${ household[i] } get paid?: household[i].jobs[j].times_per_year
+    input type: radio
+    code: |
+      times_per_year_list
+    datatype: integer
+  - How many hours does ${ household[i] } work in each period?: household[i].jobs[j].hours_per_period
+    datatype: number
+    show if: household[i].jobs[j].is_hourly
+  - What does ${ household[i] } get paid?: household[i].jobs[j].value
+    datatype: currency
+    show if: household[i].jobs[j].is_hourly
+  - Amount ${ household[i] } gets paid: household[i].jobs[j].value
+    datatype: currency
+    show if:
+      variable: household[i].jobs[j].is_hourly
+      is: False
+  - What is the net income of the job?: household[i].jobs[j].net
+    help: |
+      This is the total amount you are paid, minus the taxes and other deductions.
+    datatype: currency
+---
 generic object: ALItemizedJob
 question: |
     Does your job as a ${ x.source } have other incomes or deductions?
@@ -411,21 +527,16 @@ code: |
       'health_insurance', 'uninsured_medical', 'childcare', 'child_education', 'child_support',
       'clothing', 'laundry', 'car_insurance', 'transportation'])
 ---
-generic object: ALItemizedJob
-code: |
-  x.to_subtract[i].exists
-  if x.to_subtract[i].exists:
-    x.to_subtract[i].value
-  x.to_subtract[i].complete = True
----
 id: special training
 question: |
   Do you have any special job training?
 subquestion: |
-  For example, you should mention any trade or professional certifications and licenses you have.
+  For example, do you have any trade or professional certifications and licenses.
 fields:
-  - no label: user_training
-    input type: area
+  - Any special job training?: has_special_training
+    datatype: yesnoradio
+  - Tell us about your training: user_training
+    show if: has_special_training
     required: False
     maxlength: 140
 ---
@@ -449,23 +560,51 @@ fields:
   - Your disabilities: user_disabilities
     input type: area
     maxlength: 336
-    required: False
     show if: has_disabilities
 ---
 id: expenses review
 question: |
-  Expenses
+  Review your expenses
 subquestion: |
+  Here is what you've told us about your monthly expenses. You can add more or continue
+  to the next question.
+
   ${ users[0].expenses.table }
 
   Total monthly expenses: ${ currency(users[0].expenses.total(times_per_year=12))}
 
-  ${ expenses.add_action() }
-field: review_expenses
+  ${ users[0].expenses.add_action() }
+field: review_expenses_screen
+---
+id: income review
+question: |
+  Review your incomes 
+subquestion: |
+  Here is what you've told us about your sources of income in your household.
+
+  <h2 class="h4">Your jobs:</h2>
+
+  ${ users[0].jobs.table }
+
+  ${ users[0].jobs.add_action() }
+
+  <h2 class="h4">Your sources of income, not from employment:</h2>
+
+  ${ users[0].nonemployment.table }
+
+  ${ users[0].nonemployment.add_action() }
+
+  <h2 class="h4">Your household member's jobs</h2>
+
+  ${ household.table }
+
+  ${ household.add_action() }
+
+field: review_income_screen
 ---
 id: other monthly expenses
 question: |
-  Do you have any other mothly expenses?
+  Do you have any other monthly expenses?
 fields:
   - Other monthly expenses: users[0].expenses["other"].exists
     datatype: yesno
@@ -481,7 +620,6 @@ code: |
   user_income_net = users[0].jobs.net_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12) - users[0].expenses.total()
 ---
 id: name of one itemized job in list
-generic object: ALItemizedJobList
 question: |
   What is the the job title of your ${ 'primary' if i == 0 else ordinal(i)} job?
 subquestion: |
@@ -501,8 +639,11 @@ fields:
     show if: user_owns_home
     datatype: currency
     min: 0
-  - "How much debt do you own on the home?": user_home_debt
+  - Are there any remaining loans on the home?: user_has_home_debt
     show if: user_owns_home
+    datatype: yesnoradio
+  - How much do you have to pay on the remaining loans?: user_home_debt
+    show if: user_has_home_debt
     datatype: currency
     min: 0
 ---
@@ -516,25 +657,27 @@ fields:
     show if: user_owns_car
     maxlength: 50
   - "Car make": user_car_make
+    help: |
+      For example, Ford, Chevy, or Honda
     show if: user_owns_car
     maxlength: 50
   - "Car value": user_car_value
     show if: user_owns_car
     datatype: currency
     min: 0
-  - Do you have any car debt?: user_car_loan
+  - Do you have a car loan?: user_car_loan
     datatype: yesnoradio
     show if: user_owns_car
-  - "Car debt": user_car_debt
+  - "How much do you have to pay on the remaining loan?": user_car_debt
     show if: user_car_loan
     datatype: currency
     min: 0
 ---
 question: |
-  Do you own any property?
+  Do you own any property you haven't told us about?
 subquestion: |
   This includes physical property or real estate that you have not already told us about.
-  For example, a boat, or expensive jewelry.
+  For example, a boat, or land.
 
   % if user_owns_car or user_owns_home:
   You have already said that you own ${ comma_and_list(filter(lambda y: bool(y), [
@@ -557,7 +700,18 @@ fields:
 ---
 id: debts
 question: |
-  Do you have any unpaid debts?
+  Do you have any other unpaid debts?
+subquestion: |
+  % if (user_owns_car and user_car_loan) or (user_owns_home and user_has_home_debt):
+  You have already told us about your:
+
+  % if user_owns_car and user_car_loan:
+  * car loan for ${ currency(user_car_debt) }
+  % endif
+  % if user_owns_home and user_has_home_debt:
+  * home loan for ${ currency(user_home_debt) }
+  % endif
+  % endif
 fields:
   - no label: user_has_debts
     input type: radio
@@ -573,7 +727,7 @@ fields:
 ---
 id: miscellaneous facts
 question: |
-  What other facts may be relevant to your ability to pay fees and costs?
+  Is there anything else you want to tell the judge about your situation?
 fields:
   - no label: miscellaneous_facts
     input type: area
@@ -607,28 +761,47 @@ code: |
   addresses_to_search = [user.address for user in users]
 ---
 sets:
-  - x.employer.name.first
+  - x.jobs[i].is_self_employed
 id: employer
-generic object: ALItemizedJob
+generic object: ALIndividual
 question: |
-  Tell us who employs you as a ${ x.source }
+  Who is the employer of ${ x } ${ x.jobs[i].source }
 fields:
-  - I am self employed: x.is_self_employed
+  - ${ x } is self employed: x.jobs[i].is_self_employed
     datatype: yesno
   - code: |
-      x.employer.name_fields(person_or_business='unsure', show_if={'variable': 'x.is_self_employed', 'is': 'False'})
+      x.jobs[i].employer.name_fields(person_or_business='unsure', show_if={'variable': 'x.jobs[i].is_self_employed', 'is': 'False'})
   - code: |
-      x.employer.address.address_fields(show_if={'variable': 'x.is_self_employed', 'is': 'False'})
-  - Phone number: x.employer.phone_number
+      x.jobs[i].employer.address.address_fields(show_if={'variable': 'x.jobs[i].is_self_employed', 'is': 'False'})
+  - Phone number: x.jobs[i].employer.phone_number
+    required: False
+    show if:
+      variable: xjobs[i].is_self_employed
+      is: False
+---
+sets:
+  - users[0].jobs[i].is_self_employed
+id: employer
+question: |
+  Tell us who employs you as a ${ users[0].jobs[i].source }
+fields:
+  - I am self employed: users[0].jobs[i].is_self_employed
+    datatype: yesno
+  - code: |
+      users[0].jobs[i].employer.name_fields(person_or_business='unsure', show_if={'variable': 'users[0].jobs[i].is_self_employed', 'is': 'False'})
+  - code: |
+      users[0].jobs[i].employer.address.address_fields(show_if={'variable': 'users[0].jobs[i].is_self_employed', 'is': 'False'})
+  - Phone number: users[0].jobs[i].employer.phone_number
     required: False
 ---
 sets:
-  - x.employer.name.first
-generic object: ALItemizedJob
+  - x.jobs[i].employer.name.first
+generic object: ALIndividual
 code: |
-  if x.is_self_employed:
-    x.employer.name = users[0].name
-    x.employer.address = users[0].address
+  if x.jobs[i].is_self_employed:
+    x.jobs[i].employer.name = x.name
+    x.jobs[i].employer.address = x.address
+    x.jobs[i].employer.phone = x.phone_number
 ---
 generic object: ALItemizedJob
 template: x.employer.address.unit_label
@@ -665,12 +838,21 @@ review:
       ${ user_grade_school_completed }
   - Edit: user_training
     button: |
+      % if has_special_training:
       **Special training**:
       > ${ single_paragraph(user_training) }
-  - Edit: user_disabilities
+      % else:
+      **No special training.**
+      % endif
+  - Edit: has_disabilities
     button: |
+      % if has_disabilities:
       **Disabilities**:
+
       > ${ single_paragraph(user_disabilities) }
+      % else:
+      **No disabilities.**
+      % endif
   - Edit: user_dependents_number
     button: |
       **Number of dependents**:
@@ -701,35 +883,29 @@ review:
       **${ word("Owns home") if user_owns_home else word("Does not own home") }**
 
       % if user_owns_home:
-      **Home value**:
-      ${ currency(user_home_value) }
-
-      **Home debt**:
-      ${ currency(user_home_debt) }
+      * value: ${ currency(user_home_value) }
+      % if user_has_home_debt:
+      * debt: ${ currency(user_home_debt) }
+      % endif
       % endif
   - Edit: user_owns_car
     button: |
       **${ word("Owns car") if user_owns_car else word("Does not own car") }**
 
       % if user_owns_car:
-      **Car year**:
-      ${ user_car_year }
-
-      **Car make**:
-      ${ user_car_make }
-
-      **Car value**:
-      ${ currency(user_car_value) }
-
-      **Car debt**:
-      ${ currency(user_car_debt) }
+      * year: ${ user_car_year }
+      * make: ${ user_car_make }
+      * value: ${ currency(user_car_value) }
+      % if user_car_loan:
+      * debt: ${ currency(user_car_debt) }
+      % endif
       % endif
   - Edit: users[0].accounts.revisit
     button: |
       **Accounts**:
 
       % for acct in users[0].accounts:
-      * ${ acct }
+      * ${ acct.source } (${currency(acct.balance)})
       % endfor
   - Edit: user_owns_property
     button: |
@@ -782,7 +958,7 @@ edit:
 confirm: True
 ---
 table: users[0].jobs[i].to_subtract.table
-rows: x
+rows: users[0].jobs[i].to_subtract
 columns:
   - Type: |
       row_index
@@ -793,7 +969,7 @@ edit:
   - value
 ---
 table: users[0].jobs[i].to_add.table
-rows: x
+rows: users[0].jobs[i].to_add
 columns:
   - Type: |
       row_index
@@ -802,6 +978,20 @@ columns:
 edit:
   - exists
   - value
+---
+table: users[0].nonemployment.table
+rows: users[0].nonemployment
+columns:
+  - Type: |
+      row_item.source
+  - Times per year: |
+      times_per_year(times_per_year_list, row_item.times_per_year)
+  - Amount: |
+      currency(row_item.value)
+edit:
+  - source
+  - value
+  - times_per_year
 ---
 continue button field: household.revisit
 question: |
@@ -816,17 +1006,13 @@ rows: household
 columns:
   - Name: |
       row_item.name.full() if defined("row_item.name.first") else ""
-  - Occupation: |
-      row_item.occupation
+  - Occupations: |
+      comma_and_list(row_item.jobs.sources())
   - Income: |
-      row_item.household_income
-  - Employer: |
-      row_item.employer.name.full()
+      currency(row_item.jobs.net_total())
 edit:
   - name.first
-  - occupation
-  - household_income
-  - employer.name.first
+  - jobs.revisit
 ---
 continue button field: users[0].expenses.revisit
 question: |
@@ -850,7 +1036,7 @@ columns:
   - Name: |
       row_item.name
   - Amount: |
-      row_item.balance
+      currency(row_item.balance)
 edit:
   - name
   - balance
@@ -874,6 +1060,22 @@ subquestion: |
 
 progress: 100
 ---
+event: review_assets_and_debts
+code: |
+  review_affidavit_of_indigency_supplement
+---
+event: review_income
+code: |
+  review_affidavit_of_indigency_supplement
+---
+event: review_expenses
+code: |
+  review_affidavit_of_indigency_supplement
+---
+event: review_case_info
+code: |
+  review_affidavit_of_indigency_supplement
+---
 objects:
   - affidavit_of_indigency_supplement_post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_of_indigency_supplement_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - affidavit_of_indigency_supplement_attachment: ALDocument.using(title="Supplement to the Affidavit of Indigency", filename="affidavit_of_indigency_supplement.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
@@ -891,7 +1093,7 @@ attachments:
   - name: affidavit to indigency supplement attachment
     filename: affidavit_of_indigency_supplement.pdf
     variable name: affidavit_of_indigency_supplement_attachment[i]
-    skip undefined: True
+    skip undefined: False
     pdf template file: affidavit_of_indigency_supplement.pdf
     fields:
       - "court_name": ${ trial_court }
@@ -902,11 +1104,11 @@ attachments:
       - "users1_address_on_one_line": ${ users[0].address.on_one_line() }
       - "users1_birthdate": ${ users[0].birthdate.format() }
       - "user_grade_school_completed": ${ user_grade_school_completed }
-      - "user_training": ${ user_training }
-      - "user_disabilities": ${ user_disabilities }
+      - "user_training": ${ user_training if has_special_training else ""}
+      - "user_disabilities": ${ user_disabilities if has_disabilities else ''}
       - "user_dependents_number": ${ user_dependents_number }
-      - "user_work_name": ${ job_description }
-      - "user_income_nonemployment": ${ list_incomes(users[0].nonemployment) }
+      - "user_work_name": ${ job_description() }
+      - "user_income_nonemployment": ${ list_incomes(users[0].nonemployment) if users[0].nonemployment else 'N/A' }
       - "user_income_gross_annual": ${ thousands(users[0].jobs.gross_total(times_per_year=1) + users[0].nonemployment.total(times_per_year=1), show_decimals=True) }
       - "user_income_gross_monthly": ${ thousands(users[0].jobs.gross_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12), show_decimals=True) }
       - "user_tax_federal": ${ thousands(users[0].jobs.deduction_total(source='federal_taxes', times_per_year=12), show_decimals=True) }
@@ -919,41 +1121,41 @@ attachments:
       - "user_income_after_tax1": ${ thousands(users[0].jobs.net_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12), show_decimals=True) }
       - "user_househould_member_work_name": ${ list_household(household) }
       - "user_income_after_tax2": ${ thousands(users[0].jobs.net_total(times_per_year=12) + users[0].nonemployment.total(times_per_year=12), show_decimals=True) }
-      - "user_expense_rent": ${ thousands(users[0].expenses["rent"], show_decimals=True) }
-      - "user_expense_uninsured_medical": ${ thousands(users[0].expenses["uninsured_medical"], show_decimals=True) }
-      - "user_expense_childcare": ${ thousands(users[0].expenses["childcare"], show_decimals=True) }
-      - "user_expense_food": ${ thousands(users[0].expenses["food"], show_decimals=True) }
-      - "user_expense_electricity": ${ thousands(users[0].expenses["electricity"], show_decimals=True) }
-      - "user_expense_education": ${ thousands(users[0].expenses["child_education"], show_decimals=True) }
-      - "user_expense_child_support": ${ thousands(users[0].expenses["child_support"], show_decimals=True) }
-      - "user_expense_gas": ${ thousands(users[0].expenses["gas"], show_decimals=True) }
-      - "user_expense_oil": ${ thousands(users[0].expenses["oil"], show_decimals=True) }
-      - "user_expense_clothing": ${ thousands(users[0].expenses["clothing"], show_decimals=True) }
-      - "user_expense_water": ${ thousands(users[0].expenses["water"], show_decimals=True) }
-      - "user_expense_laundry": ${ thousands(users[0].expenses["laundry"], show_decimals=True) }
-      - "user_expense_telephone": ${ thousands(users[0].expenses["telephone"], show_decimals=True) }
-      - "user_expense_car_insurance": ${ thousands(users[0].expenses["car_insurance"], show_decimals=True) }
-      - "user_expense_health_insurance": ${ thousands(users[0].expenses["health_insurance"], show_decimals=True) }
-      - "user_expense_transportation": ${ thousands(users[0].expenses["transportation"], show_decimals=True) }
-      - "user_expense_other_amount": ${ thousands(users[0].expenses["other"], show_decimals=True) }
-      - "user_expense_other": ${ comma_and_list(set(users[0].expenses.keys()).difference(expenses_on_form)) }
+      - "user_expense_rent": ${ thousands(users[0].expenses.total(source=["rent"]), show_decimals=True) }
+      - "user_expense_uninsured_medical": ${ thousands(users[0].expenses.total(source=["uninsured_medical"]), show_decimals=True) }
+      - "user_expense_childcare": ${ thousands(users[0].expenses.total(source=["childcare"]), show_decimals=True) }
+      - "user_expense_food": ${ thousands(users[0].expenses.total(source=["food"]), show_decimals=True) }
+      - "user_expense_electricity": ${ thousands(users[0].expenses.total(source=["electricity"]), show_decimals=True) }
+      - "user_expense_education": ${ thousands(users[0].expenses.total(source=["child_education"]), show_decimals=True) }
+      - "user_expense_child_support": ${ thousands(users[0].expenses.total(source=["child_support"]), show_decimals=True) }
+      - "user_expense_gas": ${ thousands(users[0].expenses.total(source=["gas"]), show_decimals=True) }
+      - "user_expense_oil": ${ thousands(users[0].expenses.total(source=["oil"]), show_decimals=True) }
+      - "user_expense_clothing": ${ thousands(users[0].expenses.total(source=["clothing"]), show_decimals=True) }
+      - "user_expense_water": ${ thousands(users[0].expenses.total(source=["water"]), show_decimals=True) }
+      - "user_expense_laundry": ${ thousands(users[0].expenses.total(source=["laundry"]), show_decimals=True) }
+      - "user_expense_telephone": ${ thousands(users[0].expenses.total(source=["telephone"]), show_decimals=True) }
+      - "user_expense_car_insurance": ${ thousands(users[0].expenses.total(source=["car_insurance"]), show_decimals=True) }
+      - "user_expense_health_insurance": ${ thousands(users[0].expenses.total(source=["health_insurance"]), show_decimals=True) }
+      - "user_expense_transportation": ${ thousands(users[0].expenses.total(source=["transportation"]), show_decimals=True) }
+      - "user_expense_other_amount": ${ thousands(users[0].expenses.total(exclude_source=expenses_on_form), show_decimals=True) }
+      - "user_expense_other": ${ comma_and_list(set(users[0].expenses.sources()).difference(expenses_on_form)) }
       - "user_expense_total": ${ thousands(users[0].expenses.total(), show_decimals=True) }
       - "user_income_net": ${ thousands(user_income_net, show_decimals=True) }
       - "user_owns_home_yes": ${ user_owns_home }
       - "user_owns_home_no": ${ not user_owns_home }
-      - "user_home_value": ${ thousands(user_home_value, show_decimals=True) }
-      - "user_home_debt": ${ thousands(user_home_debt, show_decimals=True) }
+      - "user_home_value": ${ thousands(user_home_value, show_decimals=True) if user_owns_home else "" }
+      - "user_home_debt": ${ thousands(user_home_debt, show_decimals=True) if user_owns_home else ""}
       - "user_owns_car_yes": ${ user_owns_car }
       - "user_owns_car_no": ${ not user_owns_car }
-      - "user_car_year": ${ user_car_year }
-      - "user_car_make": ${ user_car_make }
-      - "user_car_value": ${ thousands(user_car_value, show_decimals=True) }
-      - "user_car_debt": ${ thousands(user_car_debt, show_decimals=True) }
+      - "user_car_year": ${ user_car_year if user_owns_car else ""}
+      - "user_car_make": ${ user_car_make if user_owns_car else ""}
+      - "user_car_value": ${ thousands(user_car_value, show_decimals=True) if user_owns_car else "" }
+      - "user_car_debt": ${ thousands(user_car_debt, show_decimals=True) if user_owns_car else "" }
       - "user_accounts_balance": ${ comma_and_list([currency(ac.balance) for ac in users[0].accounts], comma_string=',\n', and_string=',\n') }
-      - "user_accounts_type": ${ list_accounts(users[0].accounts) }
+      - "user_accounts_type": ${ list_accounts_source(users[0].accounts) }
       - "user_property_type": ${ user_property_type if user_owns_property else "" }
       - "user_property_value": ${ user_property_value if user_owns_property else "" }
-      - "user_debts": ${ thousands(user_debts, show_decimals=True) }
+      - "user_debts": ${ thousands(user_debts, show_decimals=True) if user_has_debts else "" }
       - "miscellaneous_facts": ${ miscellaneous_facts }
       - "users1_signature": ${ users[0].signature_if_final(i) }
       - "users1_address_line_one": ${ users[0].address.line_one() }
