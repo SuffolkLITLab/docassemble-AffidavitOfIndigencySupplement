@@ -105,6 +105,10 @@ subquestion: |
 
 progress: 100
 ---
+code: |
+  affidavit_of_indigency_supplement_post_interview_instructions.enabled = True
+  affidavit_of_indigency_supplement_attachment.enabled = True
+---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_post_interview_instructions,affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_post_interview_instructions, affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
   - al_court_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)

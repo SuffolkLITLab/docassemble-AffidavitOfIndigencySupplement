@@ -68,13 +68,14 @@ code: |
   # Below sets the user_role by asking a question.
   trial_court
   case_name
+  docket_number
   users.gather()
   set_parts(subtitle=str(users))
   users[0].address.address
   users[0].birthdate
   user_grade_school_completed
   has_disabilities
-  user_dependents_number
+  has_household_members
   if affidavit_supplement_is_standalone:
     set_progress(14)
     nav.set_section('review_income')
@@ -208,6 +209,10 @@ fields:
   - no label: household.there_are_any
     datatype: yesnoradio
 ---
+code: |
+  if not has_household_members:
+    household.there_are_any = False
+---
 question: |
   How many of your household members are employed?
 subquestion: |
@@ -215,6 +220,10 @@ subquestion: |
 fields:
   - no label: household.target_number
     datatype: integer
+---
+code: |
+  if not has_household_members:
+    household.target_number = 0
 ---
 sets:
   - household[i].name.first
@@ -351,12 +360,36 @@ subquestion: |
 ---
 id: case info
 question: |
-  What is your case name and number?
+  What is your case name?
 fields:
   - "Case name": case_name
     maxlength: 60
-  - "Case number": case_number
-    maxlength: 58
+---
+id: docket number
+question: |
+  Docket Number
+subquestion: |
+  If you know the docket number for this case, enter it below
+fields:
+  - I do not know the docket number: dont_know_docket_number
+    datatype: yesno
+  - Docket number: docket_numbers[0]
+    show if:  
+      variable: dont_know_docket_number
+      is: False
+  - What case do you want fees waived for? Briefly explain how the clerk can find your case.: docket_numbers[0]
+    show if: dont_know_docket_number
+    maxlength: 25
+help:
+  label: |
+    What's a docket number?
+  content: |
+    The docket number is a number that the court assigns to track your case.
+    
+    If this is a **new** case, you may not have one yet. You can leave
+    this blank if you're not sure.
+validation code: |
+  docket_numbers.there_is_another = False
 ---
 id: education level
 question: |
@@ -487,10 +520,16 @@ fields:
 ---
 id: dependents
 question: |
-  How many dependents do you have?
+  About your household
 fields:
-  - no label: user_dependents_number
+  - Does anyone else live with you as part of your household?: has_household_members
+    datatype: yesnoradio
+    help: |
+      For example, count your children, spouse, or other family member
+      you take care of or who helps take care of you.
+  - How many people? Don't count yourself. : household_additional_size
     datatype: integer
+    show if: has_household_members
 ---
 id: disabilities
 question: |
@@ -661,8 +700,8 @@ fields:
   - no label: user_has_debts
     input type: radio
     choices:
-      - Yes, I have unpaid debts: True
-      - No, I do not have unpaid debts: False
+      - Yes, I have other unpaid debts: True
+      - No, I do not have other unpaid debts: False
   - note: Enter debt type and amount
     show if: user_has_debts
   - 'Specify all debts': user_debts
@@ -718,7 +757,7 @@ fields:
   - Phone number: x.jobs[i].employer.phone_number
     required: False
     show if:
-      variable: xjobs[i].is_self_employed
+      variable: x.jobs[i].is_self_employed
       is: False
 ---
 sets:
@@ -735,6 +774,9 @@ fields:
       users[0].jobs[i].employer.address.address_fields(show_if={'variable': 'users[0].jobs[i].is_self_employed', 'is': 'False'})
   - Phone number: users[0].jobs[i].employer.phone_number
     required: False
+    show if:
+      variable: users[0].jobs[i].is_self_employed
+      is: False
 ---
 sets:
   - x.jobs[i].employer.name.first
@@ -851,10 +893,10 @@ review:
     button: |
       **Case name**:
       ${ case_name }
-  - Edit: case_number
+  - Edit: docket_number
     button: |
-      **Case number**:
-      ${ case_number }
+      **Docket number**:
+      ${ docket_numbers }
   - Edit: users.revisit
     button: |
       **Users**
@@ -883,10 +925,10 @@ review:
       % else:
       **No disabilities.**
       % endif
-  - Edit: user_dependents_number
+  - Edit: household_additional_size
     button: |
       **Number of dependents**:
-      ${ user_dependents_number }
+      ${ household_additional_size if has_household_members else 0 }
   - Edit: user[0].nonemployment.revisit
     button: |
       **Income, not from employment**:
@@ -962,9 +1004,13 @@ review:
       ${ signature_date }
 ---
 objects:
-  - affidavit_of_indigency_supplement_post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_of_indigency_supplement_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
-  - affidavit_of_indigency_supplement_attachment: ALDocument.using(title="Supplement to the Affidavit of Indigency", filename="affidavit_of_indigency_supplement.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - affidavit_of_indigency_supplement_post_interview_instructions: ALDocument.using(title="Instructions", filename="affidavit_of_indigency_supplement_next_steps.docx", has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - affidavit_of_indigency_supplement_attachment: ALDocument.using(title="Supplement to the Affidavit of Indigency", filename="affidavit_of_indigency_supplement.pdf", has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
 ---
+comment: |
+  According to this form and the main affidavit, everyone else in the household (besides yourself)
+  is considered a dependent. 
+  See https://github.com/SuffolkLITLab/docassemble-AffidavitOfIndigencySupplement/issues/26. 
 attachments:
   - name: affidavit to indigency supplement post interview instructions
     filename: Post-interview-instructions
@@ -979,7 +1025,7 @@ attachments:
     fields:
       - "court_name": ${ trial_court }
       - "case_name": ${ case_name }
-      - "case_number": ${ case_number }
+      - "case_number": ${ str(docket_numbers[0]) }
       - "users1_name": ${ users[0] }
       - "users1_name__2": ${ users[0] }
       - "users1_address_on_one_line": ${ users[0].address.on_one_line() }
@@ -987,7 +1033,7 @@ attachments:
       - "user_grade_school_completed": ${ user_grade_school_completed }
       - "user_training": ${ user_training if has_special_training else ""}
       - "user_disabilities": ${ user_disabilities if has_disabilities else ''}
-      - "user_dependents_number": ${ user_dependents_number }
+      - "user_dependents_number": ${ household_additional_size if has_household_members else '' }
       - "user_work_name": ${ job_description() }
       - "user_income_nonemployment": ${ list_incomes(users[0].nonemployment) if users[0].nonemployment else 'N/A' }
       - "user_income_gross_annual": ${ thousands(users[0].jobs.gross_total(times_per_year=1) + users[0].nonemployment.total(times_per_year=1), show_decimals=True) }
