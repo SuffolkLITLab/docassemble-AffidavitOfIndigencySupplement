@@ -350,13 +350,25 @@ code: |
     return comma_and_list([job.employer_name_address_phone() for job in users[0].jobs])
 ---
 id: Supplement_to_the_Affidavit_of_Indigency
-continue button field: affidavit_of_indigency_supplement_intro
 question: |
   Supplement to the Affidavit of Indigency
 subquestion: |
-  If you cannot pay for court fees or costs, you may be eligible to have the
-  state cover them. If you checked C on the Affidavit of Indigency, you must
-  fill out this form.
+  This online form will help you fill out the "Supplement to the Affidavit of Indigency."
+  This form tells the court that you cannot pay court fees. It also gives the court additional
+  information they use to decide if you qualify for sure.
+
+  You should first fill out the ["Affidavit of Indigency"](https://apps.suffolklitlab.org/start/indigency)
+  if you haven't already. If you complete the "Affidavit of Indigency" and say
+  that you can't afford to pay the fees and pay for the necessities of life,
+  then you should complete this form (that response is checkbox C on the
+  "Affidavit of Indingency") You don't have to otherwise.
+
+  You can only use this form to ask the court to help with **new**
+  costs. The court cannot give you a refund.
+  
+  This form and all of your answers on it will be kept confidential
+  (private). Only court staff will be able to see your completed form.
+continue button field: affidavit_of_indigency_supplement_intro
 ---
 id: case info
 question: |
