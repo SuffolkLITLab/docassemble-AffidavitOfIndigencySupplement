@@ -6,6 +6,7 @@ from distutils.util import convert_path
 
 standard_exclude = ('*.pyc', '*~', '.*', '*.bak', '*.swp*')
 standard_exclude_directories = ('.*', 'CVS', '_darcs', './build', './dist', 'EGG-INFO', '*.egg-info')
+
 def find_package_data(where='.', package='', exclude=standard_exclude, exclude_directories=standard_exclude_directories):
     out = {}
     stack = [(convert_path(where), '', package)]
@@ -43,9 +44,9 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.AffidavitOfIndigencySupplement',
-      version='0.0.1',
+      version='0.0.2a1',
       description=('A docassemble extension.'),
-      long_description='# docassemble.AffidavitOfIndigencySupplement\r\n\r\nA docassemble extension.\r\n\r\n## Author\r\n\r\nSamuel Roth, sroth@su.suffolk.edu\r\n\r\n',
+      long_description='# docassemble.AffidavitOfIndigencySupplement\r\n\r\nAn interview for the Massachusetts Supplement to the Affidavit of Indigency\r\n\r\n## Author\r\n\r\nSamuel Roth, sroth@su.suffolk.edu\r\n\r\n',
       long_description_content_type='text/markdown',
       author='Samuel Roth',
       author_email='sroth@su.suffolk.edu',
@@ -53,7 +54,7 @@ setup(name='docassemble.AffidavitOfIndigencySupplement',
       url='https://docassemble.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
-      install_requires=[],
+      install_requires=['docassemble-AssemblyLine', 'docassemble-MassAccess', 'docassemble-ALMassachusetts'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/AffidavitOfIndigencySupplement/', package='docassemble.AffidavitOfIndigencySupplement'),
      )

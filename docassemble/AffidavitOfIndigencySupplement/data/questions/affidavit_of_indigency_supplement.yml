@@ -1,0 +1,114 @@
+---
+include:
+  - affidavit_of_indigency_supplement_body.yml
+---
+metadata:
+  title: |
+    Supplement to the Affidavit of Indigency
+  short title: |
+    Affidavit of Indigency Supplement
+  tags:
+    - BE-04-00-00-00
+    - MO-00-00-00-00
+  authors:
+    - Bryce Willey
+    - Samuel Roth
+---
+code: |
+  interview_metadata['main_interview_key'] =  'affidavit_of_indigency_supplement'
+---
+code: |
+  github_repo_name =  'docassemble-AffidavitToIndigencySupplement'
+---
+code: |
+  interview_short_title = "File a Supplement to the Affidavit of Indigency"
+---
+code: |
+  al_form_type = "existing_case" 
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  # Turns on detailed sections when only using this form
+  affidavit_supplement_is_standalone = True
+---
+sections:
+  - review_case_info: Case and Personal Information
+  - review_income: Income
+  - review_expenses: Expenses
+  - review_assets_and_debts: Assets and Debts
+  - download_form: Download Form
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+mandatory: True
+code: |
+  al_intro_screen
+  affidavit_of_indigency_supplement_intro
+  interview_order_affidavit_of_indigency_supplement
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  affidavit_of_indigency_supplement_preview_question
+  basic_questions_signature_flow    
+  users[0].signature
+  affidavit_of_indigency_supplement_download
+---
+code: |
+  signature_fields = ['users[0].signature']
+---
+event: review_assets_and_debts
+code: |
+  review_affidavit_of_indigency_supplement
+---
+event: review_income
+code: |
+  review_affidavit_of_indigency_supplement
+---
+event: review_expenses
+code: |
+  review_affidavit_of_indigency_supplement
+---
+event: review_case_info
+code: |
+  review_affidavit_of_indigency_supplement
+---
+id: download affidavit_of_indigency_supplement
+event: affidavit_of_indigency_supplement_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_affidavit_of_indigency_supplement'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+code: |
+  affidavit_of_indigency_supplement_post_interview_instructions.enabled = True
+  affidavit_of_indigency_supplement_attachment.enabled = True
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_post_interview_instructions, affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[affidavit_of_indigency_supplement_attachment], filename="affidavit_of_indigency_supplement.pdf_package.pdf", title="All forms to download for your records", enabled=True)
