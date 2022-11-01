@@ -1026,6 +1026,7 @@ attachments:
   - name: affidavit to indigency supplement attachment
     filename: affidavit_of_indigency_supplement.pdf
     variable name: affidavit_of_indigency_supplement_attachment[i]
+    editable: False
     skip undefined: False
     pdf template file: affidavit_of_indigency_supplement.pdf
     fields:
