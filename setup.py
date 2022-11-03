@@ -44,7 +44,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.AffidavitOfIndigencySupplement',
-      version='0.0.2a1',
+      version='1.0.0rc1',
       description=('A docassemble extension.'),
       long_description='# docassemble.AffidavitOfIndigencySupplement\r\n\r\nAn interview for the Massachusetts Supplement to the Affidavit of Indigency\r\n\r\n## Author\r\n\r\nSamuel Roth, sroth@su.suffolk.edu\r\n\r\n',
       long_description_content_type='text/markdown',
