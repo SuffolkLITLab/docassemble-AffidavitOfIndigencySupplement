@@ -303,6 +303,7 @@ fields:
     input type: dropdown
     code: |
       nonemployment_income_terms_ordered
+    default: other
   - What type of income?: users[0].nonemployment[i].source
     show if:
       variable: users[0].nonemployment[i].source
@@ -334,7 +335,7 @@ code: |
       if isinstance(incomes, DAList):
           return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes.complete_elements() if hasattr(income, "times_per_year") and hasattr(income, "value") and hasattr(income, "source")])
       else:
-          return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes if hasattr(income, "times_per_year") and hasattr(income, "value")])
+          return comma_and_list([f"{income.source} ({currency(income.value)} {times_per_year(times_per_year_list, income.times_per_year)})" for income in incomes if hasattr(income, "source") and hasattr(income, "times_per_year") and hasattr(income, "value")])
 ---
 id: any more non-employment incomes
 question: |
@@ -789,9 +790,9 @@ sets:
 generic object: ALIndividual
 code: |
   if x.jobs[i].is_self_employed:
-    x.jobs[i].employer.name = x.name
     x.jobs[i].employer.address = x.address
     x.jobs[i].employer.phone = x.phone_number
+    x.jobs[i].employer.name = x.name
 ---
 generic object: ALItemizedJob
 template: x.employer.address.unit_label
@@ -859,6 +860,14 @@ edit:
   - name.first
   - jobs.revisit
 ---
+continue button field: users[0].nonemployment.revisit
+question: |
+  Edit incomes not from a job
+subquestion: |
+  ${ users[0].nonemployment.table }
+
+  ${ users[0].nonemployment.add_action() }
+---
 continue button field: users[0].expenses.revisit
 question: |
   Edit expenses
@@ -886,6 +895,8 @@ edit:
   - name
   - balance
 ---
+need:
+  - list_incomes
 id: affidavit to indigency supplement review screen
 event: review_affidavit_of_indigency_supplement
 question: |
@@ -935,7 +946,7 @@ review:
     button: |
       **Number of dependents**:
       ${ household_additional_size if has_household_members else 0 }
-  - Edit: user[0].nonemployment.revisit
+  - Edit: users[0].nonemployment.revisit
     button: |
       **Income, not from employment**:
 
@@ -1026,6 +1037,7 @@ attachments:
   - name: affidavit to indigency supplement attachment
     filename: affidavit_of_indigency_supplement.pdf
     variable name: affidavit_of_indigency_supplement_attachment[i]
+    editable: False
     skip undefined: False
     pdf template file: affidavit_of_indigency_supplement.pdf
     fields:
